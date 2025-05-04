@@ -1,0 +1,376 @@
+:root {
+    /* 색상 변수 */
+    --primary-color: #3498db;
+    --primary-hover: #2980b9;
+    --text-dark: #2c3e50;
+    --text-medium: #34495e;
+    --text-light: #7f8c8d;
+    --bg-light: #ffffff;
+    --border-light: #eee;
+
+    /* 다크 모드 색상 */
+    --dark-bg: #2d2d2d;
+    --dark-text: #f0f0f0;
+    --dark-text-light: #bdc3c7;
+    --dark-border: #444;
+
+    /* 그림자 */
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --dark-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+
+    /* 스페이싱 */
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+}
+
+.word-study-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+    text-align: center;
+}
+
+.word-card {
+    max-width: 400px;
+    min-height: 400px;
+    margin: var(--spacing-xl) auto;
+    padding: var(--spacing-xl);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    position: relative;
+    cursor: default;
+}
+
+.word-card.clickable {
+    cursor: default;
+}
+
+.word-card.clickable:hover {
+    transform: none;
+    box-shadow: var(--shadow);
+}
+
+/* 설정 영역 스타일 */
+.settings-area {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.setting-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.setting-option {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.setting-option input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.model-selector {
+    display: flex;
+    align-items: center;
+}
+
+.model-selector select {
+    padding: 3px 6px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.model-selector select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 액션 영역 스타일 */
+.action-area {
+    height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-light);
+    padding-bottom: 15px;
+}
+
+.word-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-top: 10px;
+}
+
+.word-question {
+    font-size: 2.5rem;
+    color: var(--text-dark);
+    margin: var(--spacing-xl) 0;
+}
+
+.hint {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0;
+}
+
+/* 클릭 가능한 힌트 스타일 */
+.clickable-hint {
+    cursor: pointer;
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 15px;
+    background-color: rgba(52, 152, 219, 0.1);
+    transition: all 0.2s ease;
+}
+
+.clickable-hint:hover {
+    background-color: rgba(52, 152, 219, 0.2);
+    transform: scale(1.05);
+}
+
+.word-answer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    margin-top: 0;
+}
+
+.english-word {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--text-dark);
+}
+
+.korean-meaning {
+    font-size: 1.5rem;
+    color: var(--text-medium);
+}
+
+.part-of-speech {
+    font-size: 1rem;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+/* 예문 컨테이너 스타일 */
+.example-container {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-light);
+    text-align: left;
+}
+
+.example-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.example-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+}
+
+.refresh-button {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.refresh-button:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.example-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.example-sentence {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    font-style: italic;
+}
+
+.example-translation {
+    font-size: 1rem;
+    color: var(--text-light);
+}
+
+.example-loading, .loading {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-style: italic;
+    text-align: center;
+}
+
+.example-error {
+    font-size: 0.9rem;
+    color: #e74c3c;
+    text-align: center;
+}
+
+button, .next-word-button {
+    padding: 0.8rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    margin: 0;
+}
+
+.next-word-button {
+    width: 120px;
+}
+
+button:hover, .next-word-button:hover {
+    background-color: var(--primary-hover);
+}
+
+.error-message {
+    color: #e74c3c;
+    margin: var(--spacing-md) auto;
+    padding: var(--spacing-md);
+    border-radius: 5px;
+    background-color: #fadbd8;
+    max-width: 400px;
+}
+
+/* 다크모드 대응 스타일 */
+@media (prefers-color-scheme: dark) {
+    .word-card {
+        background-color: var(--dark-bg);
+        color: var(--dark-text);
+        box-shadow: var(--dark-shadow);
+    }
+
+    .settings-area, .action-area, .example-container {
+        border-color: var(--dark-border);
+    }
+
+    .setting-option {
+        color: var(--dark-text-light);
+    }
+
+    .model-selector select {
+        background-color: var(--dark-bg);
+        border-color: var(--dark-border);
+        color: var(--dark-text);
+    }
+
+    .word-question, .english-word, .example-header h3, .example-sentence {
+        color: var(--dark-text);
+    }
+
+    .hint, .part-of-speech, .example-translation, .example-loading, .loading {
+        color: var(--dark-text-light);
+    }
+
+    .korean-meaning {
+        color: var(--dark-text-light);
+    }
+
+    .error-message {
+        background-color: #73231d;
+        color: #fadbd8;
+    }
+
+    button, .next-word-button {
+        background-color: var(--primary-hover);
+    }
+
+    button:hover, .next-word-button:hover {
+        background-color: var(--primary-color);
+    }
+}
+
+/* 모바일 장치용 반응형 스타일 */
+@media screen and (max-width: 480px) {
+    .word-card {
+        padding: var(--spacing-lg);
+        min-height: 420px;
+    }
+
+    .settings-area {
+        margin-bottom: 10px;
+    }
+
+    .setting-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .model-selector {
+        width: 100%;
+    }
+
+    .model-selector select {
+        width: 100%;
+    }
+
+    .action-area {
+        height: 50px;
+        margin-bottom: 15px;
+    }
+
+    .clickable-hint {
+        padding: 4px 8px;
+        font-size: 0.85rem;
+    }
+
+    .word-question {
+        margin: var(--spacing-lg) 0;
+        font-size: 2.2rem;
+    }
+
+    .english-word {
+        font-size: 1.8rem;
+    }
+
+    .korean-meaning {
+        font-size: 1.3rem;
+    }
+}
