@@ -1,0 +1,62 @@
+/* src/styles/Navigation.css */
+.nav-container {
+    width: 100%;
+    background-color: var(--bg-light);
+    box-shadow: var(--shadow);
+    margin-bottom: var(--spacing-xl);
+}
+
+.nav-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.nav-list li {
+    padding: 0;
+}
+
+.nav-list li a {
+    display: block;
+    padding: var(--spacing-md) var(--spacing-lg);
+    color: var(--text-dark);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.nav-list li:hover a {
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.nav-list li.active a {
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+}
+
+/* 다크모드 대응 */
+@media (prefers-color-scheme: dark) {
+    .nav-container {
+        background-color: var(--dark-bg);
+        box-shadow: var(--dark-shadow);
+    }
+
+    .nav-list li a {
+        color: var(--dark-text);
+    }
+
+    .nav-list li:hover a {
+        background-color: rgba(52, 152, 219, 0.2);
+    }
+}
+
+/* 모바일 대응 */
+@media screen and (max-width: 480px) {
+    .nav-list li a {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 0.9rem;
+    }
+}
