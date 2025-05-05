@@ -167,7 +167,7 @@ export const WordListPage = () => {
 
   return (
     <div className="word-list-container">
-      <h1>TEPS 단어 목록</h1>
+      {/*<h1>TEPS 단어 목록</h1>*/}
 
       <div className="range-controls">
         <div className="range-toggle">

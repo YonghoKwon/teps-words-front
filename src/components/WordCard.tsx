@@ -219,7 +219,7 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
               setShowAnswer(true); // 힌트 클릭 시 답 표시
             }}
           >
-            (클릭하여 답 확인)
+            (확인)
           </p>
         ) : (
           <button
