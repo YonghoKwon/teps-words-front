@@ -33,16 +33,30 @@ const DEFAULT_MODELS = [
 let cachedModels: OpenAIModel[] | null = null;
 let isModelsFetching = false;
 
+// 자동 변경 설정을 저장하기 위한 전역 변수
+let isAutoChangeEnabled = false;
+let autoChangeInterval = 3; // 초 단위 기본값
+
+// 예문 보기 설정을 저장하기 위한 전역 변수 추가
+let isShowExamplesEnabled = false;
+let lastSelectedModel = 'gpt-3.5-turbo';
+
 export const WordCard = ({ word, onNextWord }: WordCardProps) => {
   const [showAnswer, setShowAnswer] = useState(false);
   const [showEnglish, setShowEnglish] = useState(true);
   const [exampleSentence, setExampleSentence] = useState<ExampleSentence | null>(null);
   const [loadingExample, setLoadingExample] = useState(false);
   const [exampleError, setExampleError] = useState<string | null>(null);
-  const [showExamples, setShowExamples] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('gpt-3.5-turbo');
+  // 전역 변수에서 초기화
+  const [showExamples, setShowExamples] = useState(isShowExamplesEnabled);
+  const [selectedModel, setSelectedModel] = useState(lastSelectedModel);
   const [models, setModels] = useState<OpenAIModel[]>(DEFAULT_MODELS);
   const [loadingModels, setLoadingModels] = useState(false);
+
+  // 자동 변경 관련 상태 추가 - 전역 변수에서 초기화
+  const [autoChangeEnabled, setAutoChangeEnabled] = useState(isAutoChangeEnabled);
+  const [changeInterval, setChangeInterval] = useState(autoChangeInterval);
+  const timerRef = useRef<number | null>(null);
 
   // 현재 요청 상태를 추적하는 ref
   const isExampleFetchingRef = useRef(false);
@@ -96,6 +110,57 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
       isMountedRef.current = false;
     };
   }, []);
+
+  // 자동 변경 설정이 변경될 때 전역 변수에 저장
+  useEffect(() => {
+    isAutoChangeEnabled = autoChangeEnabled;
+    autoChangeInterval = changeInterval;
+  }, [autoChangeEnabled, changeInterval]);
+
+  // 예문 보기 설정이 변경될 때 전역 변수에 저장
+  useEffect(() => {
+    isShowExamplesEnabled = showExamples;
+  }, [showExamples]);
+
+  // 선택된 모델이 변경될 때 전역 변수에 저장
+  useEffect(() => {
+    lastSelectedModel = selectedModel;
+  }, [selectedModel]);
+
+  // 자동 변경 모드일 때는 항상 답변이 보이는 상태 유지
+  useEffect(() => {
+    if (autoChangeEnabled) {
+      setShowAnswer(true);
+    }
+  }, [autoChangeEnabled]);
+
+  // 자동 단어 변경 타이머 설정
+  useEffect(() => {
+    // 타이머 초기화 함수
+    const clearTimer = () => {
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+
+    // 자동 변경 기능이 활성화되어 있으면 타이머 설정
+    if (autoChangeEnabled) {
+      clearTimer(); // 기존 타이머 초기화
+      timerRef.current = window.setTimeout(() => {
+        handleNextWord();
+      }, changeInterval * 1000);
+
+      console.log(`자동 단어 변경 타이머 설정: ${changeInterval}초`);
+    } else {
+      clearTimer();
+    }
+
+    // 컴포넌트 언마운트 시 타이머 정리
+    return () => {
+      clearTimer();
+    };
+  }, [autoChangeEnabled, changeInterval, currentWord.word]); // 단어가 변경될 때마다 타이머 재설정
 
   // 예문 가져오기
   const fetchExampleSentence = async () => {
@@ -164,8 +229,17 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
   }, [showAnswer, showExamples, selectedModel, currentWord.word]);
 
   const handleNextWord = () => {
-    setShowAnswer(false);
-    setShowEnglish(Math.random() < 0.5); // 50% 확률로 영어/한글 선택
+    // 일반 모드에서는 답 표시 상태 초기화
+    if (!autoChangeEnabled) {
+      setShowAnswer(false);
+      setShowEnglish(Math.random() < 0.5); // 50% 확률로 영어/한글 선택
+    }
+    // 자동 변경 모드에서는 항상 답변이 보이는 상태 유지
+
+    // 예문 초기화
+    setExampleSentence(null);
+    currentWordRef.current = '';
+
     onNextWord();
   };
 
@@ -175,43 +249,103 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
     fetchExampleSentence();
   };
 
+  // 시간 간격 변경 핸들러
+  const handleIntervalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value > 0) {
+      setChangeInterval(value);
+    }
+  };
+
+  // 자동 변경 토글 핸들러
+  const handleAutoChangeToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isEnabled = e.target.checked;
+    setAutoChangeEnabled(isEnabled);
+
+    // 자동 변경이 활성화되면 항상 답변이 보이는 상태로 설정
+    if (isEnabled) {
+      setShowAnswer(true);
+    }
+  };
+
+  // 예문 보기 토글 핸들러
+  const handleShowExamplesToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isEnabled = e.target.checked;
+    setShowExamples(isEnabled);
+
+    // 예문 보기가 활성화되면 현재 단어의 예문 가져오기
+    if (isEnabled && showAnswer && currentWordRef.current !== currentWord.word) {
+      currentWordRef.current = '';  // 강제로 예문 가져오기 유도
+      fetchExampleSentence();
+    }
+  };
+
   return (
-    <div className={`word-card ${!showAnswer ? 'clickable' : ''}`}>
+    <div className={`word-card ${!showAnswer && !autoChangeEnabled ? 'clickable' : ''}`}>
       {/* 설정 영역 (맨 위) */}
       <div className="settings-area">
         <div className="setting-options">
-          <label className="setting-option">
-            <input
-              type="checkbox"
-              checked={showExamples}
-              onChange={(e) => setShowExamples(e.target.checked)}
-            />
-            <span>예문 보기</span>
-          </label>
+          {/* 첫 번째 줄: 자동 변경 옵션 */}
+          <div className="setting-row">
+            <label className="setting-option">
+              <input
+                type="checkbox"
+                checked={autoChangeEnabled}
+                onChange={handleAutoChangeToggle}
+              />
+              <span>자동 변경</span>
+            </label>
 
-          <div className="model-selector">
-            <select
-              value={selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-              disabled={!showExamples || loadingModels}
-            >
-              {loadingModels ? (
-                <option>모델 로딩 중...</option>
-              ) : (
-                models.map(model => (
-                  <option key={model.id} value={model.id}>
-                    {model.name}
-                  </option>
-                ))
-              )}
-            </select>
+            {autoChangeEnabled && (
+              <div className="interval-selector">
+                <input
+                  type="number"
+                  min="1"
+                  max="60"
+                  value={changeInterval}
+                  onChange={handleIntervalChange}
+                  style={{ width: '40px' }}
+                />
+                <span>초</span>
+              </div>
+            )}
+          </div>
+
+          {/* 두 번째 줄: 예문 보기 옵션 */}
+          <div className="setting-row">
+            <label className="setting-option">
+              <input
+                type="checkbox"
+                checked={showExamples}
+                onChange={handleShowExamplesToggle}
+              />
+              <span>예문 보기</span>
+            </label>
+
+            <div className="model-selector">
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                disabled={!showExamples || loadingModels}
+              >
+                {loadingModels ? (
+                  <option>모델 로딩 중...</option>
+                ) : (
+                  models.map(model => (
+                    <option key={model.id} value={model.id}>
+                      {model.name}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
       {/* 액션 영역 (설정 아래) */}
       <div className="action-area">
-        {!showAnswer ? (
+        {!showAnswer && !autoChangeEnabled ? (
           <p
             className="hint clickable-hint"
             onClick={(e) => {
@@ -222,27 +356,30 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
             (확인)
           </p>
         ) : (
-          <button
-            className="next-word-button"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleNextWord();
-            }}
-          >
-            다음 단어
-          </button>
+          !autoChangeEnabled && (
+            <button
+              className="next-word-button"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNextWord();
+              }}
+            >
+              다음 단어
+            </button>
+          )
         )}
       </div>
 
       {/* 메인 콘텐츠 영역 */}
       <div className="word-content">
-        {!showAnswer ? (
+        {!showAnswer && !autoChangeEnabled ? (
           <div className="word-question">
             {showEnglish ? currentWord.word : currentWord.meaning}
             <div className="part-of-speech">{showEnglish && currentWord.partOfSpeech}</div>
           </div>
         ) : (
           <>
+            {/* 자동 변경 모드와 일반 모드에서 동일한 답변 형태 표시 */}
             <div className="word-answer">
               <div className="english-word">{currentWord.word} <span className="part-of-speech">{currentWord.partOfSpeech}</span></div>
               <div className="korean-meaning">{currentWord.meaning}</div>

@@ -47,7 +47,7 @@ export const WordStudyPage = () => {
         endpoint = `/api/words/random/partOfSpeech/${partOfSpeech}`;
       }
 
-      // 컨셉츠 단어인 경우 쿼리 파라미터 추가
+      // 컨설텝스 단어인 경우 쿼리 파라미터 추가
       if (wordType === 'concepts') {
         endpoint += endpoint.includes('?') ? '&type=concepts' : '?type=concepts';
       }
@@ -102,7 +102,7 @@ export const WordStudyPage = () => {
                   checked={wordType === 'concepts'}
                   onChange={() => setWordType('concepts')}
                 />
-                컨셉츠 단어
+                컨설텝스 단어
               </label>
               <label>
                 <input

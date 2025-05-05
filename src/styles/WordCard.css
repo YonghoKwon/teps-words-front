@@ -504,3 +504,124 @@ button:hover, .next-word-button:hover {
         font-size: 0.85rem;
     }
 }
+
+/* src/styles/WordCard.css에 추가 */
+
+/* 전체 설정 영역 */
+.settings-area {
+    margin: 0;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+/* 설정 옵션 컨테이너 */
+.setting-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+/* 설정 행 (각 줄) */
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+}
+
+/* 개별 설정 옵션 */
+.setting-option {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    margin-right: 10px;
+}
+
+/* 입력 필드 공통 스타일 */
+.setting-option input[type="checkbox"] {
+    margin: 0;
+}
+
+/* 간격 선택기 */
+.interval-selector {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+}
+
+.interval-selector input {
+    padding: 2px 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* 모델 선택기 */
+.model-selector {
+    margin-left: auto;
+}
+
+.model-selector select {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 0.9rem;
+}
+
+/* 다크 모드 지원 */
+@media (prefers-color-scheme: dark) {
+    .settings-area {
+        border-bottom-color: #444;
+    }
+
+    .interval-selector input,
+    .model-selector select {
+        background-color: #333;
+        color: #fff;
+        border-color: #555;
+    }
+}
+
+/* 모바일 반응형 */
+@media (max-width: 480px) {
+    .setting-row {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0 5px;
+    }
+
+    .setting-option {
+        margin-right: 0;
+    }
+
+    .interval-selector {
+        margin-left: 0;
+    }
+
+    .model-selector {
+        margin-left: 0;
+        width: auto;
+    }
+
+    .model-selector select {
+        max-width: 130px;
+        font-size: 0.8rem;
+    }
+}
+
+/* 확장된 화면에서 가로 정렬 유지 */
+@media (min-width: 768px) {
+    .setting-row {
+        padding: 0 10px;
+    }
+}
+
+/* nav-container 마진 제거 */
+.nav-container {
+    margin: 0;
+}
