@@ -1,0 +1,64 @@
+.normal-word-display-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    min-width: 300px; /* Or appropriate width */
+    position: relative; /* For positioning context if needed */
+}
+
+.word-display-area h1 { /* For the word */
+    font-size: 2.5em;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.word-display-area p { /* For the meaning */
+    font-size: 1.5em;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.loading-text {
+    font-size: 1.2em;
+    color: #777;
+}
+
+.next-button-container {
+    position: fixed; /* Fixed position */
+    bottom: 20px; /* Distance from bottom */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust for exact centering */
+    padding: 10px;
+    z-index: 1000; /* Ensure it's above other content */
+}
+
+.normal-next-button {
+    padding: 12px 25px;
+    font-size: 18px;
+    cursor: pointer;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.normal-next-button:hover {
+    background-color: #218838;
+}
+
+/* Basic responsiveness: Adjust button size or position on smaller screens */
+@media (max-width: 600px) {
+    .next-button-container {
+        bottom: 10px; /* Less space from bottom on mobile */
+    }
+    .normal-next-button {
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+}
