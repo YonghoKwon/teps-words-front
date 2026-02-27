@@ -135,14 +135,20 @@ export const WordListPage = () => {
   };
 
   const scrollListTop = () => {
-    const el = wordListRef.current;
-    if (!el) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
+    const run = () => {
+      const el = wordListRef.current;
+      if (!el) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
 
-    const y = el.getBoundingClientRect().top + window.scrollY - 8;
-    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+      // 단어 목록 시작 지점 + 상단 여백 확보
+      const y = el.getBoundingClientRect().top + window.scrollY - 56;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
+    };
+
+    // 렌더 반영 후 스크롤 보장
+    requestAnimationFrame(() => setTimeout(run, 0));
   };
 
   const loadNextPage = async () => {
@@ -352,25 +358,7 @@ export const WordListPage = () => {
 
       {!loading && <div className="swipe-page-hint">← 오른쪽 스와이프: 이전 · 왼쪽 스와이프: 다음 →</div>}
 
-      {listMode === 'all' && !customRangeMode && !loading && (
-        <div className="pagination-controls bottom-pagination-controls">
-          <div className="pagination-buttons-row">
-            <button className="page-button" onClick={loadPrevPage} disabled={loading || currentRange.startSeq <= 1}>이전</button>
-            <button className="page-button" onClick={loadNextPage} disabled={loading || !hasNext}>다음</button>
-          </div>
-          <span className="current-range">현재 범위: {currentRange.startSeq}~{currentRange.endSeq}</span>
-        </div>
-      )}
 
-      {listMode !== 'all' && !loading && (
-        <div className="pagination-controls bottom-pagination-controls">
-          <div className="pagination-buttons-row">
-            <button className="page-button" onClick={prevClientPage} disabled={clientPage <= 1}>이전</button>
-            <button className="page-button" onClick={nextClientPage} disabled={clientPage >= totalClientPages}>다음</button>
-          </div>
-          <span className="current-range">현재 페이지: {clientPage}/{totalClientPages}</span>
-        </div>
-      )}
     </div>
   );
 };
