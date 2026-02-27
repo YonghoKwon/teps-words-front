@@ -78,6 +78,13 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWord.word, currentWord.meaning, currentWord.partOfSpeech, currentWord.seq, wordType]);
 
+  useEffect(() => {
+    if (showChoiceQuiz) {
+      buildChoiceQuiz();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [promptMode]);
+
   const loadProgress = async () => {
     if (!currentWord || currentWord.seq === 0) return;
 

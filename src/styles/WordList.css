@@ -156,6 +156,10 @@
     gap: var(--spacing-md);
 }
 
+.bottom-pagination-controls {
+    margin-top: 10px;
+}
+
 .page-button {
     padding: 8px 12px;
     background-color: var(--primary-color);

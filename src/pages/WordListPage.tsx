@@ -240,6 +240,14 @@ export const WordListPage = () => {
           !loading && <div className="no-words">표시할 단어가 없습니다.</div>
         )}
       </div>
+
+      {listMode === 'all' && !customRangeMode && !loading && (
+        <div className="pagination-controls bottom-pagination-controls">
+          <button className="page-button" onClick={loadPrevPage} disabled={loading || currentRange.startSeq <= 1}>이전</button>
+          <span className="current-range">{currentRange.startSeq}~{currentRange.endSeq}</span>
+          <button className="page-button" onClick={loadNextPage} disabled={loading || !hasNext}>다음</button>
+        </div>
+      )}
     </div>
   );
 };
