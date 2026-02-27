@@ -115,8 +115,33 @@ select {
     width: 100%;
 }
 
-.prompt-mode-select {
-    min-width: 120px;
+.prompt-mode-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid #ced4da;
+    border-radius: 10px;
+    overflow: hidden;
+    min-width: 170px;
+}
+
+.prompt-toggle-btn {
+    margin: 0;
+    min-height: 40px;
+    border: none;
+    background: var(--bg-light);
+    color: var(--text-medium);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 10px;
+}
+
+.prompt-toggle-btn + .prompt-toggle-btn {
+    border-left: 1px solid #ced4da;
+}
+
+.prompt-toggle-btn.active {
+    background: var(--primary-color);
+    color: #fff;
 }
 
 .apply-filter-button {
@@ -339,9 +364,14 @@ select {
         align-items: stretch;
     }
 
-    .prompt-mode-select {
-        min-width: 116px;
-        font-size: 13px;
+    .prompt-mode-toggle {
+        min-width: 150px;
+    }
+
+    .prompt-toggle-btn {
+        font-size: 12px;
+        min-height: 40px;
+        padding: 0 8px;
     }
 
     .apply-filter-button {

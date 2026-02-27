@@ -75,6 +75,7 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
   const [quizSelected, setQuizSelected] = useState<string | null>(null);
   const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
   const [quizLoading, setQuizLoading] = useState(false);
+  const [quizTarget, setQuizTarget] = useState<'meaning' | 'word'>('meaning');
   const [sessionQuizTotal, setSessionQuizTotal] = useState(0);
   const [sessionQuizCorrect, setSessionQuizCorrect] = useState(0);
 
@@ -424,19 +425,36 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
       }
 
       const words: Word[] = await response.json();
-      const distractors = words
-        .filter((w) => w.meaning !== currentWord.meaning)
-        .filter((w) => w.partOfSpeech === currentWord.partOfSpeech)
-        .map((w) => w.meaning)
-        .filter((v, i, self) => self.indexOf(v) === i)
-        .slice(0, 30);
+      const samePos = words.filter((w) => w.partOfSpeech === currentWord.partOfSpeech);
 
-      const picked = shuffle(distractors).slice(0, 2);
-      if (picked.length < 2) {
-        throw new Error('유사 보기 생성에 실패했어요. 다시 눌러주세요.');
+      if (promptMode === 'english') {
+        // 영단어를 보고 뜻 맞히기
+        const distractors = samePos
+          .filter((w) => w.meaning !== currentWord.meaning)
+          .map((w) => w.meaning)
+          .filter((v, i, self) => self.indexOf(v) === i)
+          .slice(0, 40);
+
+        const picked = shuffle(distractors).slice(0, 2);
+        if (picked.length < 2) throw new Error('유사 보기 생성에 실패했어요. 다시 눌러주세요.');
+
+        setQuizTarget('meaning');
+        setQuizChoices(shuffle([currentWord.meaning, ...picked]));
+      } else {
+        // 뜻을 보고 영단어 맞히기
+        const distractors = samePos
+          .filter((w) => w.word !== currentWord.word)
+          .map((w) => w.word)
+          .filter((v, i, self) => self.indexOf(v) === i)
+          .slice(0, 40);
+
+        const picked = shuffle(distractors).slice(0, 2);
+        if (picked.length < 2) throw new Error('유사 보기 생성에 실패했어요. 다시 눌러주세요.');
+
+        setQuizTarget('word');
+        setQuizChoices(shuffle([currentWord.word, ...picked]));
       }
 
-      setQuizChoices(shuffle([currentWord.meaning, ...picked]));
       setShowChoiceQuiz(true);
     } catch (error) {
       setProgressError(error instanceof Error ? error.message : '유사 보기 퀴즈 생성 중 오류가 발생했습니다.');
@@ -450,7 +468,8 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
     if (quizSelected !== null) return;
 
     setQuizSelected(choice);
-    const isCorrect = choice === currentWord.meaning;
+    const correctAnswer = quizTarget === 'meaning' ? currentWord.meaning : currentWord.word;
+    const isCorrect = choice === correctAnswer;
     setQuizResult(isCorrect ? 'correct' : 'wrong');
 
     const nextTotal = sessionQuizTotal + 1;
@@ -572,7 +591,9 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
 
             {showChoiceQuiz && (
               <div className="meaning-quiz-box">
-                <div className="meaning-quiz-title">유사 답변 퀴즈 (1개 정답)</div>
+                <div className="meaning-quiz-title">
+                  {quizTarget === 'meaning' ? '뜻 맞히기 퀴즈 (1개 정답)' : '영단어 맞히기 퀴즈 (1개 정답)'}
+                </div>
                 <div className="meaning-quiz-options">
                   {quizLoading && <div className="meaning-quiz-loading">퀴즈 보기 생성 중...</div>}
                   {!quizLoading && quizChoices.map((choice, idx) => (
@@ -588,7 +609,7 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
                 </div>
                 {quizResult && (
                   <div className={`meaning-quiz-result ${quizResult}`}>
-                    {quizResult === 'correct' ? '정답입니다! 🎉' : `오답입니다. 정답: ${currentWord.meaning}`}
+                    {quizResult === 'correct' ? '정답입니다! 🎉' : `오답입니다. 정답: ${quizTarget === 'meaning' ? currentWord.meaning : currentWord.word}`}
                   </div>
                 )}
               </div>

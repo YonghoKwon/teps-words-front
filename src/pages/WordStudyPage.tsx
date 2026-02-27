@@ -158,14 +158,22 @@ export const WordStudyPage = () => {
             <button className="apply-filter-button" onClick={fetchRandomWord}>
               새 단어 가져오기
             </button>
-            <select
-              className="prompt-mode-select"
-              value={promptMode}
-              onChange={(e) => setPromptMode(e.target.value as 'english' | 'meaning')}
-            >
-              <option value="english">영단어 먼저</option>
-              <option value="meaning">뜻 먼저</option>
-            </select>
+            <div className="prompt-mode-toggle" role="group" aria-label="문제 표시 방식">
+              <button
+                type="button"
+                className={`prompt-toggle-btn ${promptMode === 'english' ? 'active' : ''}`}
+                onClick={() => setPromptMode('english')}
+              >
+                영단어 먼저
+              </button>
+              <button
+                type="button"
+                className={`prompt-toggle-btn ${promptMode === 'meaning' ? 'active' : ''}`}
+                onClick={() => setPromptMode('meaning')}
+              >
+                뜻 먼저
+              </button>
+            </div>
           </div>
         </div>
       </div>
