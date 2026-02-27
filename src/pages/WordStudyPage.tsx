@@ -32,6 +32,7 @@ export const WordStudyPage = () => {
   const [wordType, setWordType] = useState<'concepts' | 'regular'>('concepts');
   const [partOfSpeech, setPartOfSpeech] = useState<string>('all');
   const [studyMode, setStudyMode] = useState<'normal' | 'bookmark' | 'wrong'>('normal');
+  const [promptMode, setPromptMode] = useState<'english' | 'meaning'>('english');
 
   // API 호출 함수
   const fetchRandomWord = async () => {
@@ -153,9 +154,19 @@ export const WordStudyPage = () => {
             </select>
           </div>
 
-          <button className="apply-filter-button" onClick={fetchRandomWord}>
-            새 단어 가져오기
-          </button>
+          <div className="fetch-row">
+            <button className="apply-filter-button" onClick={fetchRandomWord}>
+              새 단어 가져오기
+            </button>
+            <select
+              className="prompt-mode-select"
+              value={promptMode}
+              onChange={(e) => setPromptMode(e.target.value as 'english' | 'meaning')}
+            >
+              <option value="english">영단어 먼저</option>
+              <option value="meaning">뜻 먼저</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -166,6 +177,7 @@ export const WordStudyPage = () => {
           <WordCard
             word={currentWord}
             wordType={wordType}
+            promptMode={promptMode}
             onNextWord={fetchRandomWord}
           />
           {error && (

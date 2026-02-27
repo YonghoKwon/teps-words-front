@@ -7,6 +7,7 @@ import '../styles/WordCard.css';
 interface WordCardProps {
   word: Word | null;
   wordType: 'concepts' | 'regular';
+  promptMode: 'english' | 'meaning';
   onNextWord: () => void;
 }
 
@@ -53,17 +54,18 @@ try {
   // ignore
 }
 
-export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
+export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardProps) => {
   const [showAnswer, setShowAnswer] = useState(false);
-  const [showEnglish, setShowEnglish] = useState(true);
   const [exampleSentence, setExampleSentence] = useState<ExampleSentence | null>(null);
   const [loadingExample, setLoadingExample] = useState(false);
   const [exampleError, setExampleError] = useState<string | null>(null);
   // 기본값: 예문 보기 숨김
-  const [showExamples, setShowExamples] = useState(false);
-  const [selectedModel, setSelectedModel] = useState(lastSelectedModel);
+  const [showExamples] = useState(false);
+  const [selectedModel] = useState(lastSelectedModel);
   const [models, setModels] = useState<OpenAIModel[]>(DEFAULT_MODELS);
   const [loadingModels, setLoadingModels] = useState(false);
+  void models;
+  void loadingModels;
   const [bookmarked, setBookmarked] = useState(false);
   const [wrongCount, setWrongCount] = useState(0);
   const [progressLoading, setProgressLoading] = useState(false);
@@ -267,7 +269,6 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
     // 일반 모드에서는 답 표시 상태 초기화
     if (!autoChangeEnabled) {
       setShowAnswer(false);
-      setShowEnglish(Math.random() < 0.5); // 50% 확률로 영어/한글 선택
     }
     // 자동 변경 모드에서는 항상 답변이 보이는 상태 유지
 
@@ -307,17 +308,6 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
     }
   };
 
-  // 예문 보기 토글 핸들러
-  const handleShowExamplesToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isEnabled = e.target.checked;
-    setShowExamples(isEnabled);
-
-    // 예문 보기가 활성화되면 현재 단어의 예문 가져오기
-    if (isEnabled && showAnswer && currentWordRef.current !== currentWord.word) {
-      currentWordRef.current = '';  // 강제로 예문 가져오기 유도
-      fetchExampleSentence();
-    }
-  };
 
   const showGestureHint = (message: string) => {
     setGestureHint(message);
@@ -420,6 +410,7 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
   const buildMeaningQuiz = async () => {
     if (!currentWord || currentWord.seq === 0) return;
 
+    setShowChoiceQuiz(true);
     setQuizLoading(true);
     setQuizResult(null);
     setQuizSelected(null);
@@ -517,37 +508,6 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
             )}
           </div>
 
-          {/* 두 번째 줄: 예문 보기 옵션 */}
-          <div className="setting-row">
-            <label className="setting-option">
-              <input
-                type="checkbox"
-                checked={showExamples}
-                onChange={handleShowExamplesToggle}
-              />
-              <span>예문 보기</span>
-            </label>
-
-            {showExamples && (
-              <div className="model-selector">
-                <select
-                  value={selectedModel}
-                  onChange={(e) => setSelectedModel(e.target.value)}
-                  disabled={loadingModels}
-                >
-                  {loadingModels ? (
-                    <option>모델 로딩 중...</option>
-                  ) : (
-                    models.map(model => (
-                      <option key={model.id} value={model.id}>
-                        {model.name}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </div>
-            )}
-          </div>
 
 
         </div>
@@ -599,22 +559,23 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
       <div className="word-content">
         {!showAnswer && !autoChangeEnabled ? (
           <div className="word-question">
-            {showEnglish ? currentWord.word : currentWord.meaning}
-            <div className="part-of-speech">{showEnglish && currentWord.partOfSpeech}</div>
+            {promptMode === 'english' ? currentWord.word : currentWord.meaning}
+            <div className="part-of-speech">{promptMode === 'english' && currentWord.partOfSpeech}</div>
           </div>
         ) : (
           <>
             {/* 자동 변경 모드와 일반 모드에서 동일한 답변 형태 표시 */}
             <div className="word-answer">
               <div className="english-word">{currentWord.word} <span className="part-of-speech">{currentWord.partOfSpeech}</span></div>
-              <div className="korean-meaning">{currentWord.meaning}</div>
+              {!showChoiceQuiz && <div className="korean-meaning">{currentWord.meaning}</div>}
             </div>
 
             {showChoiceQuiz && (
               <div className="meaning-quiz-box">
                 <div className="meaning-quiz-title">유사 답변 퀴즈 (1개 정답)</div>
                 <div className="meaning-quiz-options">
-                  {quizChoices.map((choice, idx) => (
+                  {quizLoading && <div className="meaning-quiz-loading">퀴즈 보기 생성 중...</div>}
+                  {!quizLoading && quizChoices.map((choice, idx) => (
                     <button
                       key={`${choice}-${idx}`}
                       className={`meaning-choice ${quizSelected === choice ? 'selected' : ''}`}
