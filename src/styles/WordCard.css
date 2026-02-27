@@ -666,6 +666,38 @@ button:hover, .next-word-button:hover {
     margin-bottom: 8px;
 }
 
+.word-card {
+    background: #ffffff;
+    border: 1px solid #edf2f7;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.progress-actions button,
+.mobile-fixed-cta,
+.mobile-fixed-quiz-btn,
+.meaning-choice {
+    border-radius: 10px;
+}
+
+.word-answer {
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.meaning-quiz-title {
+    font-weight: 800;
+}
+
+.meaning-choice {
+    min-height: 40px;
+    font-weight: 600;
+}
+
+.swipe-guide {
+    margin-top: 10px;
+    opacity: 0.85;
+}
+
 .progress-actions button {
     margin: 0;
     flex: 1;

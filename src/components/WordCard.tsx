@@ -184,20 +184,7 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
       const samePos = words.filter((w) => w.partOfSpeech === currentWord.partOfSpeech);
 
       if (promptMode === 'english') {
-        // 영단어 먼저 모드 -> 영단어 퀴즈
-        const distractors = samePos
-          .filter((w) => w.word !== currentWord.word)
-          .map((w) => w.word)
-          .filter((v, i, self) => self.indexOf(v) === i)
-          .slice(0, 40);
-
-        const picked = shuffle(distractors).slice(0, 2);
-        if (picked.length < 2) throw new Error('유사 보기 생성에 실패했어요. 다시 눌러주세요.');
-
-        setQuizTarget('word');
-        setQuizChoices(shuffle([currentWord.word, ...picked]));
-      } else {
-        // 뜻 먼저 모드 -> 뜻 퀴즈
+        // 영단어 먼저 모드의 영단어 퀴즈 -> 보기는 뜻
         const distractors = samePos
           .filter((w) => w.meaning !== currentWord.meaning)
           .map((w) => w.meaning)
@@ -209,6 +196,19 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
 
         setQuizTarget('meaning');
         setQuizChoices(shuffle([currentWord.meaning, ...picked]));
+      } else {
+        // 뜻 먼저 모드의 뜻 퀴즈 -> 보기는 영단어
+        const distractors = samePos
+          .filter((w) => w.word !== currentWord.word)
+          .map((w) => w.word)
+          .filter((v, i, self) => self.indexOf(v) === i)
+          .slice(0, 40);
+
+        const picked = shuffle(distractors).slice(0, 2);
+        if (picked.length < 2) throw new Error('유사 보기 생성에 실패했어요. 다시 눌러주세요.');
+
+        setQuizTarget('word');
+        setQuizChoices(shuffle([currentWord.word, ...picked]));
       }
     } catch (error) {
       setProgressError(error instanceof Error ? error.message : '유사 보기 퀴즈 생성 중 오류가 발생했습니다.');

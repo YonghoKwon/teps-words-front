@@ -320,17 +320,18 @@ select {
 
 @media screen and (max-width: 480px) {
     .word-study-container {
-        padding: 4px;
+        padding: 6px;
     }
 
     .filter-controls {
-        padding: 8px;
-        margin-bottom: 8px;
-        border-radius: 12px;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
     }
 
     .filter-section {
-        gap: 8px;
+        gap: 10px;
     }
 
     .word-type-selector,
@@ -340,32 +341,22 @@ select {
         gap: 8px;
     }
 
-    /* 단어 유형이 두 줄로 깨지지 않게 2열 고정 */
-    .radio-buttons {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
-    }
-
-    .radio-buttons label {
-        font-size: 13px;
-        white-space: nowrap;
-    }
-
     .part-of-speech-selector select {
         width: 100%;
         min-width: 0;
-        min-height: 38px;
+        min-height: 40px;
         font-size: 14px;
+        border-radius: 10px;
     }
 
     .fetch-row {
         align-items: stretch;
+        gap: 8px;
     }
 
     .prompt-mode-toggle {
-        min-width: 150px;
+        min-width: 160px;
+        border-radius: 10px;
     }
 
     .prompt-toggle-btn {
@@ -379,5 +370,6 @@ select {
         margin-top: 0;
         min-height: 40px;
         font-size: 14px;
+        border-radius: 10px;
     }
 }
