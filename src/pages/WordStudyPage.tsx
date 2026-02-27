@@ -75,17 +75,13 @@ export const WordStudyPage = () => {
         return;
       }
 
-      let endpoint = '/api/words/random';
-
-      // 품사 필터가 있는 경우 경로 파라미터 방식으로 조회
-      if (partOfSpeech !== 'all') {
-        endpoint = `/api/words/random/partOfSpeech/${partOfSpeech}`;
+      const params = new URLSearchParams();
+      params.set('type', wordType);
+      if (wordType === 'concepts' && partOfSpeech !== 'all') {
+        params.set('partOfSpeech', partOfSpeech);
       }
 
-      // 컨설텝스 단어인 경우 쿼리 파라미터 추가
-      if (wordType === 'concepts') {
-        endpoint += endpoint.includes('?') ? '&type=concepts' : '?type=concepts';
-      }
+      const endpoint = `/api/words/random?${params.toString()}`;
 
       console.log('API 요청 경로:', endpoint);
       const response = await fetch(endpoint);

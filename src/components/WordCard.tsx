@@ -52,11 +52,19 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
   const touchStartYRef = useRef<number | null>(null);
   const lastWrongKeyRef = useRef<string>('');
   const lastWrongTimeRef = useRef<number>(0);
+  const quizAutoNextTimerRef = useRef<number | null>(null);
   const [gestureHint, setGestureHint] = useState<string | null>(null);
 
   useEffect(() => {
     setSessionQuizTotal(sessionQuizTotalCache);
     setSessionQuizCorrect(sessionQuizCorrectCache);
+
+    return () => {
+      if (quizAutoNextTimerRef.current !== null) {
+        window.clearTimeout(quizAutoNextTimerRef.current);
+        quizAutoNextTimerRef.current = null;
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -81,6 +89,11 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
   };
 
   const handleNextWord = () => {
+    if (quizAutoNextTimerRef.current !== null) {
+      window.clearTimeout(quizAutoNextTimerRef.current);
+      quizAutoNextTimerRef.current = null;
+    }
+
     setShowAnswer(false);
     setShowChoiceQuiz(false);
     setQuizChoices([]);
@@ -244,7 +257,10 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
       await handleMarkWrong(true);
     }
 
-    window.setTimeout(() => {
+    if (quizAutoNextTimerRef.current !== null) {
+      window.clearTimeout(quizAutoNextTimerRef.current);
+    }
+    quizAutoNextTimerRef.current = window.setTimeout(() => {
       handleNextWord();
     }, 3000);
   };
