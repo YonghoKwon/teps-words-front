@@ -1,20 +1,23 @@
-// src/components/Navigation.tsx
-import { Link, useLocation } from 'react-router-dom';
-import '../styles/Navigation.css';
+import { SegmentedControl } from '@mantine/core';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export const Navigation = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const value = location.pathname === '/words' ? 'words' : 'random';
 
   return (
-    <nav className="nav-container">
-      <ul className="nav-list">
-        <li className={location.pathname === '/' ? 'active' : ''}>
-          <Link to="/">랜덤 단어</Link>
-        </li>
-        <li className={location.pathname === '/words' ? 'active' : ''}>
-          <Link to="/words">단어 목록</Link>
-        </li>
-      </ul>
-    </nav>
+    <SegmentedControl
+      fullWidth
+      radius="xl"
+      size="md"
+      value={value}
+      onChange={(next) => navigate(next === 'words' ? '/words' : '/')}
+      data={[
+        { label: '랜덤 단어', value: 'random' },
+        { label: '단어 목록', value: 'words' },
+      ]}
+    />
   );
 };
