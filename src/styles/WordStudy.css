@@ -30,10 +30,11 @@
 /* 필터 컨트롤 영역 */
 .filter-controls {
     margin-bottom: 20px;
-    background-color: var(--background-light);
-    border-radius: 8px;
+    background: linear-gradient(160deg, #ffffff 0%, #f8fbff 100%);
+    border: 1px solid #e8eef8;
+    border-radius: 16px;
     padding: 15px;
-    box-shadow: var(--shadow);
+    box-shadow: 0 10px 30px rgba(27, 74, 168, 0.08);
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -118,29 +119,30 @@ select {
 .prompt-mode-toggle {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    border: 1px solid #ced4da;
-    border-radius: 10px;
+    border: 1px solid #cfe0ff;
+    border-radius: 12px;
     overflow: hidden;
     min-width: 170px;
+    background: #edf3ff;
 }
 
 .prompt-toggle-btn {
     margin: 0;
     min-height: 40px;
     border: none;
-    background: var(--bg-light);
-    color: var(--text-medium);
+    background: transparent;
+    color: #3d4b66;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     padding: 0 10px;
 }
 
 .prompt-toggle-btn + .prompt-toggle-btn {
-    border-left: 1px solid #ced4da;
+    border-left: 1px solid #cfe0ff;
 }
 
 .prompt-toggle-btn.active {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, #2f80ed, #1d62cc);
     color: #fff;
 }
 
@@ -163,33 +165,42 @@ select {
 }
 
 /* 다크모드 대응 */
-@media (prefers-color-scheme: dark) {
-    .filter-controls {
-        background-color: var(--dark-bg-light);
-        box-shadow: var(--dark-shadow);
-    }
+:root[data-mantine-color-scheme='dark'] .filter-controls {
+    background: linear-gradient(160deg, rgba(18, 24, 38, 0.92) 0%, rgba(15, 23, 42, 0.92) 100%);
+    border-color: #273247;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(8px);
+}
 
-    .filter-label {
-        color: var(--dark-text);
-    }
+:root[data-mantine-color-scheme='dark'] .filter-label {
+    color: #e5e7eb;
+}
 
-    .radio-buttons label {
-        color: var(--dark-text-light);
-    }
+:root[data-mantine-color-scheme='dark'] select {
+    background-color: #111827;
+    color: #e5e7eb;
+    border-color: #334155;
+}
 
-    select {
-        background-color: var(--dark-bg);
-        color: var(--dark-text);
-        border-color: var(--dark-border);
-    }
+:root[data-mantine-color-scheme='dark'] .prompt-mode-toggle {
+    background: #111827;
+    border-color: #334155;
+}
 
-    .apply-filter-button {
-        background-color: var(--primary-hover);
-    }
+:root[data-mantine-color-scheme='dark'] .prompt-toggle-btn {
+    color: #cbd5e1;
+}
 
-    .apply-filter-button:hover {
-        background-color: var(--primary-color);
-    }
+:root[data-mantine-color-scheme='dark'] .prompt-toggle-btn + .prompt-toggle-btn {
+    border-left-color: #334155;
+}
+
+:root[data-mantine-color-scheme='dark'] .apply-filter-button {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+:root[data-mantine-color-scheme='dark'] .apply-filter-button:hover {
+    background: linear-gradient(135deg, #1d4ed8, #1e40af);
 }
 
 /* 모바일 장치용 반응형 스타일 - 아이폰 16 프로 최적화 */

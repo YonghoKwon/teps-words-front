@@ -667,16 +667,40 @@ button:hover, .next-word-button:hover {
 }
 
 .word-card {
-    background: #ffffff;
-    border: 1px solid #edf2f7;
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    background: linear-gradient(165deg, #ffffff 0%, #f7faff 100%);
+    border: 1px solid #e6eefb;
+    box-shadow: 0 14px 34px rgba(31, 66, 135, 0.10);
 }
 
 .progress-actions button,
 .mobile-fixed-cta,
 .mobile-fixed-quiz-btn,
 .meaning-choice {
-    border-radius: 10px;
+    border-radius: 12px;
+}
+
+.mobile-fixed-cta {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
+    backdrop-filter: blur(6px);
+}
+
+.mobile-fixed-quiz-btn {
+    background: linear-gradient(135deg, rgba(71, 85, 105, 0.92), rgba(30, 41, 59, 0.92));
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.28);
+    backdrop-filter: blur(6px);
+}
+
+.bookmark-button {
+    background: #f5f9ff;
+    border: 1px solid #cdddf7;
+    color: #2a3a57;
+}
+
+.wrong-button {
+    background: #fff5f5;
+    border: 1px solid #ffcfcf;
+    color: #be2f2f;
 }
 
 .word-answer {
@@ -690,7 +714,19 @@ button:hover, .next-word-button:hover {
 
 .meaning-choice {
     min-height: 40px;
-    font-weight: 600;
+    font-weight: 500;
+}
+
+.word-question,
+.english-word {
+    font-weight: 800;
+}
+
+.korean-meaning,
+.swipe-guide,
+.quiz-accuracy-status,
+.progress-status {
+    font-weight: 500;
 }
 
 .swipe-guide {
@@ -954,65 +990,64 @@ button:hover, .next-word-button:hover {
     }
 }
 
-@media (prefers-color-scheme: dark) {
-    .word-card {
-        background: #111827;
-        color: #e5e7eb;
-    }
+:root[data-mantine-color-scheme='dark'] .word-card {
+    background: linear-gradient(165deg, #111827 0%, #0f172a 100%);
+    color: #e5e7eb;
+    border-color: #273247;
+}
 
-    .bookmark-button {
-        background: #1f2937;
-        color: #e5e7eb;
-        border-color: #374151;
-    }
+:root[data-mantine-color-scheme='dark'] .bookmark-button {
+    background: #1f2937;
+    color: #e5e7eb;
+    border-color: #374151;
+}
 
-    .bookmark-button.active {
-        background: #78350f;
-        color: #fde68a;
-        border-color: #92400e;
-    }
+:root[data-mantine-color-scheme='dark'] .bookmark-button.active {
+    background: #78350f;
+    color: #fde68a;
+    border-color: #92400e;
+}
 
-    .wrong-button {
-        background: #3f1d1d;
-        color: #fecaca;
-        border-color: #7f1d1d;
-    }
+:root[data-mantine-color-scheme='dark'] .wrong-button {
+    background: #3f1d1d;
+    color: #fecaca;
+    border-color: #7f1d1d;
+}
 
-    .meaning-quiz-box {
-        background: #0f1d33;
-        border-color: #2a3b57;
-    }
+:root[data-mantine-color-scheme='dark'] .meaning-quiz-box {
+    background: #0f1d33;
+    border-color: #2a3b57;
+}
 
-    .meaning-quiz-title {
-        color: #d1d5db;
-    }
+:root[data-mantine-color-scheme='dark'] .meaning-quiz-title {
+    color: #d1d5db;
+}
 
-    .meaning-choice {
-        background: #152238;
-        color: #e5e7eb;
-        border-color: #334155;
-    }
+:root[data-mantine-color-scheme='dark'] .meaning-choice {
+    background: #152238;
+    color: #e5e7eb;
+    border-color: #334155;
+}
 
-    .meaning-choice.selected {
-        background: #1e3a5f;
-        border-color: #60a5fa;
-    }
+:root[data-mantine-color-scheme='dark'] .meaning-choice.selected {
+    background: #1e3a5f;
+    border-color: #60a5fa;
+}
 
-    .mobile-fixed-quiz-btn {
-        background: #334155;
-    }
+:root[data-mantine-color-scheme='dark'] .mobile-fixed-quiz-btn {
+    background: linear-gradient(135deg, #334155, #1f2937);
+}
 
-    .swipe-guide {
-        color: #9ca3af;
-    }
+:root[data-mantine-color-scheme='dark'] .swipe-guide {
+    color: #9ca3af;
+}
 
-    .gesture-toast {
-        background: rgba(255, 255, 255, 0.15);
-        color: #f9fafb;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
+:root[data-mantine-color-scheme='dark'] .gesture-toast {
+    background: rgba(255, 255, 255, 0.15);
+    color: #f9fafb;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
 
-    .mobile-fixed-cta {
-        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
-    }
+:root[data-mantine-color-scheme='dark'] .mobile-fixed-cta {
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
 }

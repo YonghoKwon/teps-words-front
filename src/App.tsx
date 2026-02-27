@@ -25,10 +25,10 @@ function ColorSchemeToggle() {
 function App() {
   return (
     <Router>
-      <AppShell padding="md">
-        <Container size="sm" px={0}>
-          <Group justify="space-between" mb="sm">
-            <Text fw={800}>TEPS Words</Text>
+      <AppShell padding="xs">
+        <Container size="sm" px={6}>
+          <Group justify="space-between" mb={8}>
+            <Text fw={800} c="blue.1" style={{ letterSpacing: 0.2 }}>TEPS Words</Text>
             <ColorSchemeToggle />
           </Group>
 
