@@ -26,6 +26,7 @@ export const WordListPage = () => {
   const [clientPage, setClientPage] = useState(1);
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
+  const wordListRef = useRef<HTMLDivElement | null>(null);
 
   const fetchWords = async (start: number, end: number) => {
     setLoading(true);
@@ -134,7 +135,14 @@ export const WordListPage = () => {
   };
 
   const scrollListTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const el = wordListRef.current;
+    if (!el) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const y = el.getBoundingClientRect().top + window.scrollY - 8;
+    window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
   };
 
   const loadNextPage = async () => {
@@ -322,6 +330,7 @@ export const WordListPage = () => {
       )}
 
       <div
+        ref={wordListRef}
         className={`word-list ${compactView ? 'compact' : ''}`}
         onTouchStart={handleListTouchStart}
         onTouchEnd={handleListTouchEnd}
