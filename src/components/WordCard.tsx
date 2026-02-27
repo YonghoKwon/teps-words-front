@@ -42,7 +42,6 @@ let autoChangeInterval = 5; // 초 단위 기본값
 // 예문 보기 설정을 저장하기 위한 전역 변수 추가
 let isShowExamplesEnabled = false;
 let lastSelectedModel = 'gpt-3.5-turbo';
-let swipeSensitivity: 'low' | 'medium' | 'high' = 'medium';
 
 export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
   const [showAnswer, setShowAnswer] = useState(false);
@@ -59,12 +58,13 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
   const [wrongCount, setWrongCount] = useState(0);
   const [progressLoading, setProgressLoading] = useState(false);
   const [progressError, setProgressError] = useState<string | null>(null);
-  const [swipeLevel, setSwipeLevel] = useState<'low' | 'medium' | 'high'>(swipeSensitivity);
   const [showChoiceQuiz, setShowChoiceQuiz] = useState(false);
   const [quizChoices, setQuizChoices] = useState<string[]>([]);
   const [quizSelected, setQuizSelected] = useState<string | null>(null);
   const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
   const [quizLoading, setQuizLoading] = useState(false);
+  const [sessionQuizTotal, setSessionQuizTotal] = useState(0);
+  const [sessionQuizCorrect, setSessionQuizCorrect] = useState(0);
 
   // 자동 변경 관련 상태 추가 - 전역 변수에서 초기화
   const [autoChangeEnabled, setAutoChangeEnabled] = useState(isAutoChangeEnabled);
@@ -146,9 +146,6 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
     lastSelectedModel = selectedModel;
   }, [selectedModel]);
 
-  useEffect(() => {
-    swipeSensitivity = swipeLevel;
-  }, [swipeLevel]);
 
   // 자동 변경 모드일 때는 항상 답변이 보이는 상태 유지
   useEffect(() => {
@@ -156,6 +153,13 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
       setShowAnswer(true);
     }
   }, [autoChangeEnabled]);
+
+  useEffect(() => {
+    const total = Number(sessionStorage.getItem('quiz_total') || '0');
+    const correct = Number(sessionStorage.getItem('quiz_correct') || '0');
+    setSessionQuizTotal(total);
+    setSessionQuizCorrect(correct);
+  }, []);
 
   // 자동 단어 변경 타이머 설정
   useEffect(() => {
@@ -332,7 +336,7 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
     touchStartXRef.current = null;
     touchStartYRef.current = null;
 
-    const threshold = swipeLevel === 'high' ? 30 : swipeLevel === 'low' ? 70 : 50;
+    const threshold = 50;
 
     // 세로 스크롤 제스처와 충돌 방지
     if (Math.abs(diffY) > Math.abs(diffX)) return;
@@ -447,10 +451,24 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
     }
   };
 
-  const handlePickChoice = (choice: string) => {
+  const handlePickChoice = async (choice: string) => {
+    if (quizSelected !== null) return;
+
     setQuizSelected(choice);
     const isCorrect = choice === currentWord.meaning;
     setQuizResult(isCorrect ? 'correct' : 'wrong');
+
+    const nextTotal = sessionQuizTotal + 1;
+    const nextCorrect = sessionQuizCorrect + (isCorrect ? 1 : 0);
+    setSessionQuizTotal(nextTotal);
+    setSessionQuizCorrect(nextCorrect);
+    sessionStorage.setItem('quiz_total', String(nextTotal));
+    sessionStorage.setItem('quiz_correct', String(nextCorrect));
+
+    if (!isCorrect) {
+      await handleMarkWrong();
+    }
+
     showGestureHint(isCorrect ? '정답!' : '오답!');
   };
 
@@ -523,16 +541,7 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
             <label className="setting-option">
               <span>스와이프 감도</span>
             </label>
-            <div className="model-selector">
-              <select
-                value={swipeLevel}
-                onChange={(e) => setSwipeLevel(e.target.value as 'low' | 'medium' | 'high')}
-              >
-                <option value="high">민감</option>
-                <option value="medium">보통</option>
-                <option value="low">둔감</option>
-              </select>
-            </div>
+            <div className="model-selector fixed-text">보통</div>
           </div>
         </div>
       </div>
@@ -573,6 +582,9 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
 
       <div className="progress-status">
         {progressLoading ? '진행 상태 불러오는 중...' : `오답 ${wrongCount}회`}
+      </div>
+      <div className="quiz-accuracy-status">
+        퀴즈 정답률(세션): {sessionQuizTotal > 0 ? `${Math.round((sessionQuizCorrect / sessionQuizTotal) * 100)}% (${sessionQuizCorrect}/${sessionQuizTotal})` : '아직 없음'}
       </div>
       {progressError && <div className="progress-error">{progressError}</div>}
 
@@ -656,18 +668,6 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
 
       {!autoChangeEnabled && (
         <div className="mobile-fixed-cta-wrap">
-          {showAnswer && (
-            <button
-              className="mobile-fixed-quiz-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                buildMeaningQuiz();
-              }}
-              disabled={quizLoading}
-            >
-              {quizLoading ? '생성 중...' : '유사 답변 퀴즈'}
-            </button>
-          )}
           <button
             className="mobile-fixed-cta"
             onClick={(e) => {
@@ -680,6 +680,19 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
             }}
           >
             {showAnswer ? '다음 단어' : '정답 보기'}
+          </button>
+          <button
+            className="mobile-fixed-quiz-btn"
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (!showAnswer) {
+                setShowAnswer(true);
+              }
+              await buildMeaningQuiz();
+            }}
+            disabled={quizLoading}
+          >
+            {quizLoading ? '생성 중...' : '퀴즈'}
           </button>
         </div>
       )}

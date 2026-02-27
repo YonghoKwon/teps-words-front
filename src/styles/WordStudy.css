@@ -58,6 +58,20 @@
     margin-bottom: 8px;
 }
 
+.inline-selector-row {
+    gap: 8px;
+}
+
+.inline-selector-row .filter-label {
+    min-width: 68px;
+    margin-right: 0;
+}
+
+.inline-selector-row select {
+    flex: 1;
+    min-width: 0;
+}
+
 .radio-buttons {
     display: flex;
     gap: 15px;
@@ -285,9 +299,9 @@ select {
 
     .word-type-selector,
     .part-of-speech-selector {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
     }
 
     /* 단어 유형이 두 줄로 깨지지 않게 2열 고정 */

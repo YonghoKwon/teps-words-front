@@ -28,10 +28,10 @@ export const WordStudyPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
 
-  // 단어 유형 및 품사 필터 상태 추가
+  // 단어 유형 및 품사 필터 상태
   const [wordType, setWordType] = useState<'concepts' | 'regular'>('concepts');
   const [partOfSpeech, setPartOfSpeech] = useState<string>('all');
-  const [reviewMode, setReviewMode] = useState(false);
+  const [studyMode, setStudyMode] = useState<'normal' | 'bookmark' | 'wrong'>('normal');
 
   // API 호출 함수
   const fetchRandomWord = async () => {
@@ -41,29 +41,35 @@ export const WordStudyPage = () => {
     try {
       console.log('단어 가져오기 요청 시작');
 
-      if (reviewMode) {
-        const wrongResponse = await fetch('/api/words/wrongs');
-        if (!wrongResponse.ok) {
-          throw new Error('오답 목록을 가져오는데 실패했습니다.');
+      if (studyMode === 'bookmark' || studyMode === 'wrong') {
+        const endpoint = studyMode === 'bookmark' ? '/api/words/bookmarks' : '/api/words/wrongs';
+        const response = await fetch(endpoint);
+        if (!response.ok) {
+          throw new Error(studyMode === 'bookmark' ? '즐겨찾기 단어를 가져오지 못했습니다.' : '오답 단어를 가져오지 못했습니다.');
         }
 
-        const wrongs = await wrongResponse.json();
-        if (!Array.isArray(wrongs) || wrongs.length === 0) {
-          throw new Error('저장된 오답이 없습니다. 오답 +1 버튼을 눌러 복습 단어를 쌓아보세요.');
+        const rows = await response.json();
+        const filtered = (Array.isArray(rows) ? rows : []).filter((r: any) => {
+          const typeOk = !r.wordType || r.wordType === wordType;
+          const posOk = partOfSpeech === 'all' || r.partOfSpeech === partOfSpeech;
+          return typeOk && posOk;
+        });
+
+        if (filtered.length === 0) {
+          throw new Error(studyMode === 'bookmark' ? '조건에 맞는 즐겨찾기 단어가 없습니다.' : '조건에 맞는 오답 단어가 없습니다.');
         }
 
-        const candidates = [...wrongs]
-          .sort((a, b) => (b.wrongCount ?? 0) - (a.wrongCount ?? 0))
-          .slice(0, 20)
-          .map(item => ({
-            seq: item.seq,
-            word: item.word,
-            partOfSpeech: item.partOfSpeech,
-            meaning: item.meaning,
-          }));
+        const sorted = studyMode === 'wrong'
+          ? [...filtered].sort((a: any, b: any) => (b.wrongCount ?? 0) - (a.wrongCount ?? 0)).slice(0, 30)
+          : filtered;
 
-        const pick = candidates[Math.floor(Math.random() * candidates.length)];
-        setCurrentWord(pick);
+        const pick = sorted[Math.floor(Math.random() * sorted.length)];
+        setCurrentWord({
+          seq: pick.seq,
+          word: pick.word,
+          partOfSpeech: pick.partOfSpeech,
+          meaning: pick.meaning,
+        });
         return;
       }
 
@@ -119,36 +125,17 @@ export const WordStudyPage = () => {
       {/* 필터 컨트롤 영역 */}
       <div className="filter-controls">
         <div className="filter-section">
-          <div className="word-type-selector">
+          <div className="word-type-selector inline-selector-row">
             <label className="filter-label">단어 유형:</label>
-            <div className="radio-buttons">
-              <label>
-                <input
-                  type="radio"
-                  name="wordType"
-                  checked={wordType === 'concepts'}
-                  onChange={() => setWordType('concepts')}
-                />
-                컨설텝스 단어
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  name="wordType"
-                  checked={wordType === 'regular'}
-                  onChange={() => setWordType('regular')}
-                />
-                일반 단어
-              </label>
-            </div>
+            <select value={wordType} onChange={(e) => setWordType(e.target.value as 'concepts' | 'regular')}>
+              <option value="concepts">컨설텝스 단어</option>
+              <option value="regular">일반 단어</option>
+            </select>
           </div>
 
-          <div className="part-of-speech-selector">
+          <div className="part-of-speech-selector inline-selector-row">
             <label className="filter-label">품사:</label>
-            <select
-              value={partOfSpeech}
-              onChange={(e) => setPartOfSpeech(e.target.value)}
-            >
+            <select value={partOfSpeech} onChange={(e) => setPartOfSpeech(e.target.value)}>
               {PART_OF_SPEECH_OPTIONS.map(option => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -157,19 +144,16 @@ export const WordStudyPage = () => {
             </select>
           </div>
 
-          <label className="setting-option" style={{ marginLeft: 0 }}>
-            <input
-              type="checkbox"
-              checked={reviewMode}
-              onChange={(e) => setReviewMode(e.target.checked)}
-            />
-            <span>복습 모드(오답 우선)</span>
-          </label>
+          <div className="part-of-speech-selector inline-selector-row">
+            <label className="filter-label">모드:</label>
+            <select value={studyMode} onChange={(e) => setStudyMode(e.target.value as 'normal' | 'bookmark' | 'wrong')}>
+              <option value="normal">일반 단어 보기</option>
+              <option value="bookmark">즐겨찾기 단어 보기</option>
+              <option value="wrong">오답 단어 보기</option>
+            </select>
+          </div>
 
-          <button
-            className="apply-filter-button"
-            onClick={fetchRandomWord}
-          >
+          <button className="apply-filter-button" onClick={fetchRandomWord}>
             새 단어 가져오기
           </button>
         </div>
