@@ -337,35 +337,37 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
         <div className="swipe-guide">
           ← 왼쪽 스와이프: 다음 단어 · 오른쪽 스와이프: 정답 보기 →
         </div>
+
+        <div className="mobile-fixed-cta-wrap inline-cta-wrap">
+          <button
+            className="mobile-fixed-cta"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!showAnswer) {
+                setShowAnswer(true);
+              } else {
+                handleNextWord();
+              }
+            }}
+          >
+            {showAnswer ? '다음 단어' : '정답 보기'}
+          </button>
+          <button
+            className="mobile-fixed-quiz-btn"
+            onClick={async (e) => {
+              e.stopPropagation();
+              await buildChoiceQuiz();
+            }}
+            disabled={quizLoading}
+          >
+            {quizLoading ? '생성 중...' : (promptMode === 'english' ? '영단어 퀴즈' : '뜻 퀴즈')}
+          </button>
+        </div>
       </div>
 
       {gestureHint && <div className="gesture-toast">{gestureHint}</div>}
 
-      <div className="mobile-fixed-cta-wrap">
-        <button
-          className="mobile-fixed-cta"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!showAnswer) {
-              setShowAnswer(true);
-            } else {
-              handleNextWord();
-            }
-          }}
-        >
-          {showAnswer ? '다음 단어' : '정답 보기'}
-        </button>
-        <button
-          className="mobile-fixed-quiz-btn"
-          onClick={async (e) => {
-            e.stopPropagation();
-            await buildChoiceQuiz();
-          }}
-          disabled={quizLoading}
-        >
-          {quizLoading ? '생성 중...' : (promptMode === 'english' ? '영단어 퀴즈' : '뜻 퀴즈')}
-        </button>
-      </div>
+
     </div>
   );
 };

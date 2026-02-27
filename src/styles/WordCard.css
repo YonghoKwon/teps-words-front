@@ -125,6 +125,9 @@
     flex-direction: column;
     justify-content: flex-start;
     margin-top: 10px;
+    position: relative;
+    padding-bottom: 66px;
+    min-height: 280px;
 }
 
 /* 단어 질문 스타일 - 영어 단어와 동일한 스타일로 변경 */
@@ -731,6 +734,7 @@ button:hover, .next-word-button:hover {
 
 .swipe-guide {
     margin-top: 10px;
+    margin-bottom: 12px;
     opacity: 0.85;
 }
 
@@ -819,8 +823,7 @@ button:hover, .next-word-button:hover {
 @media (max-width: 480px) {
     .word-card {
         padding: 8px;
-        /* 하단 고정 CTA(2개 버튼)와 내용 겹침 방지 */
-        padding-bottom: 188px;
+        padding-bottom: 12px;
         border-radius: 12px;
     }
 
@@ -881,11 +884,7 @@ button:hover, .next-word-button:hover {
     background: #f8fbff;
 }
 
-@media (max-width: 480px) {
-    .meaning-quiz-box {
-        padding-bottom: 168px;
-    }
-}
+
 
 .meaning-quiz-title {
     font-size: 13px;
@@ -955,39 +954,33 @@ button:hover, .next-word-button:hover {
 }
 
 .mobile-fixed-cta-wrap {
-    display: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.inline-cta-wrap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: 12px;
 }
 
 .mobile-fixed-cta,
 .mobile-fixed-quiz-btn {
-    min-height: 46px;
+    min-height: 44px;
     border-radius: 12px;
     font-weight: 800;
     letter-spacing: 0.2px;
     margin: 0;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(47, 128, 237, 0.28);
 }
 
 .mobile-fixed-quiz-btn {
     background: #475569;
-}
-
-@media (max-width: 480px) {
-    .mobile-fixed-cta-wrap {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        position: fixed;
-        left: 12px;
-        right: 12px;
-        bottom: calc(78px + env(safe-area-inset-bottom));
-        z-index: 40;
-    }
-
-    .mobile-fixed-cta,
-    .mobile-fixed-quiz-btn {
-        width: 100%;
-        box-shadow: 0 10px 25px rgba(47, 128, 237, 0.28);
-    }
 }
 
 :root[data-mantine-color-scheme='dark'] .word-card {

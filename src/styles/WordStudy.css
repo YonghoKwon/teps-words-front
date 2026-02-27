@@ -110,25 +110,51 @@ select {
     transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
+.filters-toggle-wrap {
+    display: flex;
+    justify-content: flex-end;
+    margin: 6px 4px 10px;
+}
+
+.filters-toggle-btn {
+    border: 1px solid #2f80ed;
+    color: #2f80ed;
+    background: transparent;
+    border-radius: 999px;
+    min-height: 34px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 700;
+    margin: 0;
+}
+
 .fetch-row {
     display: flex;
     gap: 8px;
     width: 100%;
 }
 
+.fetch-row > * {
+    flex: 1;
+}
+
+.bottom-fetch-row {
+    margin-top: 10px;
+}
 .prompt-mode-toggle {
     display: grid;
     grid-template-columns: 1fr 1fr;
     border: 1px solid #cfe0ff;
     border-radius: 12px;
     overflow: hidden;
-    min-width: 170px;
+    min-width: 0;
     background: #edf3ff;
+    height: 44px;
 }
 
 .prompt-toggle-btn {
     margin: 0;
-    min-height: 40px;
+    min-height: 44px;
     border: none;
     background: transparent;
     color: #3d4b66;
@@ -149,6 +175,7 @@ select {
 .apply-filter-button {
     margin-top: 5px;
     padding: 8px 16px;
+    min-height: 44px;
     background-color: var(--primary-color);
     color: white;
     border: none;
@@ -201,6 +228,12 @@ select {
 
 :root[data-mantine-color-scheme='dark'] .apply-filter-button:hover {
     background: linear-gradient(135deg, #1d4ed8, #1e40af);
+}
+
+:root[data-mantine-color-scheme='dark'] .filters-toggle-btn {
+    border-color: #60a5fa;
+    color: #93c5fd;
+    background: rgba(30, 58, 138, 0.2);
 }
 
 /* 모바일 장치용 반응형 스타일 - 아이폰 16 프로 최적화 */
@@ -379,7 +412,7 @@ select {
     .apply-filter-button {
         width: auto;
         margin-top: 0;
-        min-height: 40px;
+        min-height: 44px;
         font-size: 14px;
         border-radius: 10px;
     }

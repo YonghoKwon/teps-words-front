@@ -39,19 +39,17 @@ a {
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text-dark: #f3f4f6;
-    --text-medium: #d1d5db;
-    --text-light: #9ca3af;
-    --bg-light: #1f2937;
-    --background-light: #0b1220;
-    --border-light: #374151;
-    --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-  }
+:root[data-mantine-color-scheme='dark'] {
+  --text-dark: #f3f4f6;
+  --text-medium: #d1d5db;
+  --text-light: #9ca3af;
+  --bg-light: #1f2937;
+  --background-light: #0b1220;
+  --border-light: #374151;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
 
-  body {
-    background: radial-gradient(circle at top, #111827 0%, #0b1220 60%);
-    color: var(--text-dark);
-  }
+:root[data-mantine-color-scheme='dark'] body {
+  background: radial-gradient(circle at top, #111827 0%, #0b1220 60%);
+  color: var(--text-dark);
 }

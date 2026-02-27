@@ -33,6 +33,7 @@ export const WordStudyPage = () => {
   const [partOfSpeech, setPartOfSpeech] = useState<string>('all');
   const [studyMode, setStudyMode] = useState<'normal' | 'bookmark' | 'wrong'>('normal');
   const [promptMode, setPromptMode] = useState<'english' | 'meaning'>('english');
+  const [showFilters, setShowFilters] = useState(false);
 
   // API 호출 함수
   const fetchRandomWord = async () => {
@@ -123,38 +124,52 @@ export const WordStudyPage = () => {
 
   return (
     <div className="word-study-container">
+      <div className="filters-toggle-wrap">
+        <button className="filters-toggle-btn" onClick={() => setShowFilters(v => !v)}>
+          {showFilters ? '옵션 숨기기' : '옵션 보기'}
+        </button>
+      </div>
+
       {/* 필터 컨트롤 영역 */}
-      <div className="filter-controls">
-        <div className="filter-section">
-          <div className="word-type-selector inline-selector-row">
-            <label className="filter-label">단어 유형:</label>
-            <select value={wordType} onChange={(e) => setWordType(e.target.value as 'concepts' | 'regular')}>
-              <option value="concepts">컨설텝스 단어</option>
-              <option value="regular">일반 단어</option>
-            </select>
-          </div>
+      {showFilters && (
+        <div className="filter-controls">
+          <div className="filter-section">
+            <div className="word-type-selector inline-selector-row">
+              <label className="filter-label">단어 유형:</label>
+              <select value={wordType} onChange={(e) => setWordType(e.target.value as 'concepts' | 'regular')}>
+                <option value="concepts">컨설텝스 단어</option>
+                <option value="regular">일반 단어</option>
+              </select>
+            </div>
 
-          <div className="part-of-speech-selector inline-selector-row">
-            <label className="filter-label">품사:</label>
-            <select value={partOfSpeech} onChange={(e) => setPartOfSpeech(e.target.value)}>
-              {PART_OF_SPEECH_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div className="part-of-speech-selector inline-selector-row">
+              <label className="filter-label">품사:</label>
+              <select value={partOfSpeech} onChange={(e) => setPartOfSpeech(e.target.value)}>
+                {PART_OF_SPEECH_OPTIONS.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="part-of-speech-selector inline-selector-row">
-            <label className="filter-label">모드:</label>
-            <select value={studyMode} onChange={(e) => setStudyMode(e.target.value as 'normal' | 'bookmark' | 'wrong')}>
-              <option value="normal">일반 단어 보기</option>
-              <option value="bookmark">즐겨찾기 단어 보기</option>
-              <option value="wrong">오답 단어 보기</option>
-            </select>
+            <div className="part-of-speech-selector inline-selector-row">
+              <label className="filter-label">모드:</label>
+              <select value={studyMode} onChange={(e) => setStudyMode(e.target.value as 'normal' | 'bookmark' | 'wrong')}>
+                <option value="normal">일반 단어 보기</option>
+                <option value="bookmark">즐겨찾기 단어 보기</option>
+                <option value="wrong">오답 단어 보기</option>
+              </select>
+            </div>
           </div>
+        </div>
+      )}
 
-          <div className="fetch-row">
+      {loading ? (
+        <div className="loading">단어를 불러오는 중...</div>
+      ) : (
+        <>
+          <div className="fetch-row bottom-fetch-row">
             <button className="apply-filter-button" onClick={fetchRandomWord}>
               새 단어 가져오기
             </button>
@@ -175,19 +190,14 @@ export const WordStudyPage = () => {
               </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      {loading ? (
-        <div className="loading">단어를 불러오는 중...</div>
-      ) : (
-        <>
           <WordCard
             word={currentWord}
             wordType={wordType}
             promptMode={promptMode}
             onNextWord={fetchRandomWord}
           />
+
           {error && (
             <div className="error-message">
               {error}
