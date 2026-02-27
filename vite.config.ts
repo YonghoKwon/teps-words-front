@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
+const backendTarget = process.env.VITE_API_TARGET || 'http://localhost:8080'
+
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -12,7 +13,7 @@ export default defineConfig({
     ],
     proxy: {
       '/api': {
-        target: 'http://k-yongho.iptime.org:8080', // 외부에서 접근 가능한 백엔드 주소
+        target: backendTarget,
         changeOrigin: true
       }
     }

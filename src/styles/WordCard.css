@@ -660,6 +660,50 @@ button:hover, .next-word-button:hover {
     padding-bottom: 10px;
 }
 
+.progress-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.progress-actions button {
+    margin: 0;
+    flex: 1;
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.bookmark-button {
+    background: #f8fafc;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+}
+
+.bookmark-button.active {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #f59e0b;
+}
+
+.wrong-button {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.progress-status {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-bottom: 6px;
+}
+
+.progress-error {
+    color: #dc2626;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+
 .word-question,
 .english-word {
     font-size: clamp(1.7rem, 7vw, 2.2rem);
@@ -773,6 +817,24 @@ button:hover, .next-word-button:hover {
     .word-card {
         background: #111827;
         color: #e5e7eb;
+    }
+
+    .bookmark-button {
+        background: #1f2937;
+        color: #e5e7eb;
+        border-color: #374151;
+    }
+
+    .bookmark-button.active {
+        background: #78350f;
+        color: #fde68a;
+        border-color: #92400e;
+    }
+
+    .wrong-button {
+        background: #3f1d1d;
+        color: #fecaca;
+        border-color: #7f1d1d;
     }
 
     .swipe-guide {

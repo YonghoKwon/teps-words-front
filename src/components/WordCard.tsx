@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Word } from '../types/Word.ts';
 import { generateExampleSentence, fetchAvailableModels, OpenAIModel } from '../services/OpenaiService';
+import { addBookmark, addWrongAnswer, fetchWordProgress, removeBookmark } from '../services/WordProgressService';
 import '../styles/WordCard.css';
 
 interface WordCardProps {
   word: Word | null;
+  wordType: 'concepts' | 'regular';
   onNextWord: () => void;
 }
 
@@ -40,8 +42,9 @@ let autoChangeInterval = 5; // 초 단위 기본값
 // 예문 보기 설정을 저장하기 위한 전역 변수 추가
 let isShowExamplesEnabled = false;
 let lastSelectedModel = 'gpt-3.5-turbo';
+let swipeSensitivity: 'low' | 'medium' | 'high' = 'medium';
 
-export const WordCard = ({ word, onNextWord }: WordCardProps) => {
+export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
   const [showAnswer, setShowAnswer] = useState(false);
   const [showEnglish, setShowEnglish] = useState(true);
   const [exampleSentence, setExampleSentence] = useState<ExampleSentence | null>(null);
@@ -52,6 +55,11 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
   const [selectedModel, setSelectedModel] = useState(lastSelectedModel);
   const [models, setModels] = useState<OpenAIModel[]>(DEFAULT_MODELS);
   const [loadingModels, setLoadingModels] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+  const [wrongCount, setWrongCount] = useState(0);
+  const [progressLoading, setProgressLoading] = useState(false);
+  const [progressError, setProgressError] = useState<string | null>(null);
+  const [swipeLevel, setSwipeLevel] = useState<'low' | 'medium' | 'high'>(swipeSensitivity);
 
   // 자동 변경 관련 상태 추가 - 전역 변수에서 초기화
   const [autoChangeEnabled, setAutoChangeEnabled] = useState(isAutoChangeEnabled);
@@ -66,6 +74,7 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
   const isMountedRef = useRef(false);
   // 스와이프 제스처용 ref/state
   const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
   const [gestureHint, setGestureHint] = useState<string | null>(null);
 
   // 서버에서 단어를 불러오지 못했을 때 기본 단어 사용
@@ -129,6 +138,10 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
   useEffect(() => {
     lastSelectedModel = selectedModel;
   }, [selectedModel]);
+
+  useEffect(() => {
+    swipeSensitivity = swipeLevel;
+  }, [swipeLevel]);
 
   // 자동 변경 모드일 때는 항상 답변이 보이는 상태 유지
   useEffect(() => {
@@ -231,6 +244,10 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
     };
   }, [showAnswer, showExamples, selectedModel, currentWord.word]);
 
+  useEffect(() => {
+    loadProgress();
+  }, [currentWord.word, currentWord.meaning, currentWord.partOfSpeech, currentWord.seq, wordType]);
+
   const handleNextWord = () => {
     // 일반 모드에서는 답 표시 상태 초기화
     if (!autoChangeEnabled) {
@@ -290,16 +307,25 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
 
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     touchStartXRef.current = e.changedTouches[0]?.clientX ?? null;
+    touchStartYRef.current = e.changedTouches[0]?.clientY ?? null;
   };
 
   const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (autoChangeEnabled || touchStartXRef.current === null) return;
+    if (autoChangeEnabled || touchStartXRef.current === null || touchStartYRef.current === null) return;
 
     const endX = e.changedTouches[0]?.clientX ?? touchStartXRef.current;
+    const endY = e.changedTouches[0]?.clientY ?? touchStartYRef.current;
     const diffX = endX - touchStartXRef.current;
-    touchStartXRef.current = null;
+    const diffY = endY - touchStartYRef.current;
 
-    if (Math.abs(diffX) < 50) return;
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+
+    const threshold = swipeLevel === 'high' ? 30 : swipeLevel === 'low' ? 70 : 50;
+
+    // 세로 스크롤 제스처와 충돌 방지
+    if (Math.abs(diffY) > Math.abs(diffX)) return;
+    if (Math.abs(diffX) < threshold) return;
 
     if (diffX > 0) {
       // 오른쪽 스와이프: 정답 보기
@@ -311,6 +337,52 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
       // 왼쪽 스와이프: 다음 단어
       handleNextWord();
       showGestureHint('다음 단어');
+    }
+  };
+
+  const loadProgress = async () => {
+    if (!currentWord || currentWord.seq === 0) return;
+
+    setProgressLoading(true);
+    setProgressError(null);
+    try {
+      const progress = await fetchWordProgress(currentWord, wordType);
+      setBookmarked(progress.bookmarked);
+      setWrongCount(progress.wrongCount);
+    } catch (error) {
+      setProgressError(error instanceof Error ? error.message : '진행 상태를 불러오지 못했습니다.');
+    } finally {
+      setProgressLoading(false);
+    }
+  };
+
+  const handleToggleBookmark = async () => {
+    if (!currentWord || currentWord.seq === 0) return;
+    try {
+      if (bookmarked) {
+        await removeBookmark(currentWord, wordType);
+        setBookmarked(false);
+        showGestureHint('즐겨찾기 해제');
+      } else {
+        await addBookmark(currentWord, wordType);
+        setBookmarked(true);
+        showGestureHint('즐겨찾기 저장');
+      }
+      setProgressError(null);
+    } catch (error) {
+      setProgressError(error instanceof Error ? error.message : '즐겨찾기 처리 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleMarkWrong = async () => {
+    if (!currentWord || currentWord.seq === 0) return;
+    try {
+      const wrong = await addWrongAnswer(currentWord, wordType);
+      setWrongCount(wrong.wrongCount ?? wrongCount + 1);
+      setProgressError(null);
+      showGestureHint('오답 저장');
+    } catch (error) {
+      setProgressError(error instanceof Error ? error.message : '오답 저장 중 오류가 발생했습니다.');
     }
   };
 
@@ -378,6 +450,22 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
               </select>
             </div>
           </div>
+
+          <div className="setting-row">
+            <label className="setting-option">
+              <span>스와이프 감도</span>
+            </label>
+            <div className="model-selector">
+              <select
+                value={swipeLevel}
+                onChange={(e) => setSwipeLevel(e.target.value as 'low' | 'medium' | 'high')}
+              >
+                <option value="high">민감</option>
+                <option value="medium">보통</option>
+                <option value="low">둔감</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -407,6 +495,18 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
           )
         )}
       </div>
+
+      <div className="progress-actions">
+        <button className={`bookmark-button ${bookmarked ? 'active' : ''}`} onClick={handleToggleBookmark}>
+          {bookmarked ? '★ 즐겨찾기됨' : '☆ 즐겨찾기'}
+        </button>
+        <button className="wrong-button" onClick={handleMarkWrong}>오답 +1</button>
+      </div>
+
+      <div className="progress-status">
+        {progressLoading ? '진행 상태 불러오는 중...' : `오답 ${wrongCount}회`}
+      </div>
+      {progressError && <div className="progress-error">{progressError}</div>}
 
       {/* 메인 콘텐츠 영역 */}
       <div className="word-content">

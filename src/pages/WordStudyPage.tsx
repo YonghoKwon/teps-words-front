@@ -145,9 +145,21 @@ export const WordStudyPage = () => {
         <>
           <WordCard
             word={currentWord}
+            wordType={wordType}
             onNextWord={fetchRandomWord}
           />
-          {error && <div className="error-message">{error}</div>}
+          {error && (
+            <div className="error-message">
+              {error}
+              <button
+                className="apply-filter-button"
+                style={{ marginTop: '10px', width: '100%' }}
+                onClick={fetchRandomWord}
+              >
+                다시 시도
+              </button>
+            </div>
+          )}
         </>
       )}
     </div>
