@@ -933,6 +933,12 @@ button:hover, .next-word-button:hover {
     color: #b91c1c;
 }
 
+.auto-next-countdown {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--text-light);
+}
+
 .swipe-guide {
     margin-top: 14px;
     color: var(--text-light);

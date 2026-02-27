@@ -44,6 +44,7 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
   const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizTarget, setQuizTarget] = useState<'meaning' | 'word'>('meaning');
+  const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
 
   const [sessionQuizTotal, setSessionQuizTotal] = useState(0);
   const [sessionQuizCorrect, setSessionQuizCorrect] = useState(0);
@@ -53,6 +54,7 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
   const lastWrongKeyRef = useRef<string>('');
   const lastWrongTimeRef = useRef<number>(0);
   const quizAutoNextTimerRef = useRef<number | null>(null);
+  const quizCountdownIntervalRef = useRef<number | null>(null);
   const [gestureHint, setGestureHint] = useState<string | null>(null);
 
   useEffect(() => {
@@ -63,6 +65,10 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
       if (quizAutoNextTimerRef.current !== null) {
         window.clearTimeout(quizAutoNextTimerRef.current);
         quizAutoNextTimerRef.current = null;
+      }
+      if (quizCountdownIntervalRef.current !== null) {
+        window.clearInterval(quizCountdownIntervalRef.current);
+        quizCountdownIntervalRef.current = null;
       }
     };
   }, []);
@@ -93,7 +99,12 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
       window.clearTimeout(quizAutoNextTimerRef.current);
       quizAutoNextTimerRef.current = null;
     }
+    if (quizCountdownIntervalRef.current !== null) {
+      window.clearInterval(quizCountdownIntervalRef.current);
+      quizCountdownIntervalRef.current = null;
+    }
 
+    setAutoNextCountdown(null);
     setShowAnswer(false);
     setShowChoiceQuiz(false);
     setQuizChoices([]);
@@ -260,6 +271,25 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
     if (quizAutoNextTimerRef.current !== null) {
       window.clearTimeout(quizAutoNextTimerRef.current);
     }
+    if (quizCountdownIntervalRef.current !== null) {
+      window.clearInterval(quizCountdownIntervalRef.current);
+    }
+
+    setAutoNextCountdown(3);
+    quizCountdownIntervalRef.current = window.setInterval(() => {
+      setAutoNextCountdown((prev) => {
+        if (prev === null) return null;
+        if (prev <= 1) {
+          if (quizCountdownIntervalRef.current !== null) {
+            window.clearInterval(quizCountdownIntervalRef.current);
+            quizCountdownIntervalRef.current = null;
+          }
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
     quizAutoNextTimerRef.current = window.setTimeout(() => {
       handleNextWord();
     }, 3000);
@@ -345,9 +375,14 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
               ))}
             </div>
             {quizResult && (
-              <div className={`meaning-quiz-result ${quizResult}`}>
-                {quizResult === 'correct' ? '정답입니다! 🎉' : `오답입니다. 정답: ${quizTarget === 'meaning' ? currentWord.meaning : currentWord.word}`}
-              </div>
+              <>
+                <div className={`meaning-quiz-result ${quizResult}`}>
+                  {quizResult === 'correct' ? '정답입니다! 🎉' : `오답입니다. 정답: ${quizTarget === 'meaning' ? currentWord.meaning : currentWord.word}`}
+                </div>
+                {autoNextCountdown !== null && (
+                  <div className="auto-next-countdown">{autoNextCountdown}초 후 다음 단어로 이동</div>
+                )}
+              </>
             )}
           </div>
         )}
