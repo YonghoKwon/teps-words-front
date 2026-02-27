@@ -39,11 +39,19 @@ let isModelsFetching = false;
 let isAutoChangeEnabled = false;
 let autoChangeInterval = 5; // 초 단위 기본값
 
-// 예문 보기 설정을 저장하기 위한 전역 변수 추가
-let isShowExamplesEnabled = false;
+// 예문 모델 선택만 유지
 let lastSelectedModel = 'gpt-3.5-turbo';
 let sessionQuizTotalCache = 0;
 let sessionQuizCorrectCache = 0;
+
+try {
+  const t = Number(sessionStorage.getItem('quiz_total') || '0');
+  const c = Number(sessionStorage.getItem('quiz_correct') || '0');
+  if (Number.isFinite(t)) sessionQuizTotalCache = t;
+  if (Number.isFinite(c)) sessionQuizCorrectCache = c;
+} catch (_) {
+  // ignore
+}
 
 export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
   const [showAnswer, setShowAnswer] = useState(false);
@@ -51,8 +59,8 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
   const [exampleSentence, setExampleSentence] = useState<ExampleSentence | null>(null);
   const [loadingExample, setLoadingExample] = useState(false);
   const [exampleError, setExampleError] = useState<string | null>(null);
-  // 전역 변수에서 초기화
-  const [showExamples, setShowExamples] = useState(isShowExamplesEnabled);
+  // 기본값: 예문 보기 숨김
+  const [showExamples, setShowExamples] = useState(false);
   const [selectedModel, setSelectedModel] = useState(lastSelectedModel);
   const [models, setModels] = useState<OpenAIModel[]>(DEFAULT_MODELS);
   const [loadingModels, setLoadingModels] = useState(false);
@@ -138,10 +146,6 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
     autoChangeInterval = changeInterval;
   }, [autoChangeEnabled, changeInterval]);
 
-  // 예문 보기 설정이 변경될 때 전역 변수에 저장
-  useEffect(() => {
-    isShowExamplesEnabled = showExamples;
-  }, [showExamples]);
 
   // 선택된 모델이 변경될 때 전역 변수에 저장
   useEffect(() => {
@@ -157,12 +161,6 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
   }, [autoChangeEnabled]);
 
   useEffect(() => {
-    const totalFromStorage = Number(sessionStorage.getItem('quiz_total') || '0');
-    const correctFromStorage = Number(sessionStorage.getItem('quiz_correct') || '0');
-
-    sessionQuizTotalCache = Number.isFinite(totalFromStorage) ? totalFromStorage : sessionQuizTotalCache;
-    sessionQuizCorrectCache = Number.isFinite(correctFromStorage) ? correctFromStorage : sessionQuizCorrectCache;
-
     setSessionQuizTotal(sessionQuizTotalCache);
     setSessionQuizCorrect(sessionQuizCorrectCache);
   }, []);
@@ -530,23 +528,25 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
               <span>예문 보기</span>
             </label>
 
-            <div className="model-selector">
-              <select
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-                disabled={!showExamples || loadingModels}
-              >
-                {loadingModels ? (
-                  <option>모델 로딩 중...</option>
-                ) : (
-                  models.map(model => (
-                    <option key={model.id} value={model.id}>
-                      {model.name}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
+            {showExamples && (
+              <div className="model-selector">
+                <select
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value)}
+                  disabled={loadingModels}
+                >
+                  {loadingModels ? (
+                    <option>모델 로딩 중...</option>
+                  ) : (
+                    models.map(model => (
+                      <option key={model.id} value={model.id}>
+                        {model.name}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+            )}
           </div>
 
 
