@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Word } from '../types/Word.ts';
 import '../styles/WordList.css';
 
@@ -24,6 +24,8 @@ export const WordListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [compactView, setCompactView] = useState(true);
   const [clientPage, setClientPage] = useState(1);
+  const touchStartXRef = useRef<number | null>(null);
+  const touchStartYRef = useRef<number | null>(null);
 
   const fetchWords = async (start: number, end: number) => {
     setLoading(true);
@@ -210,6 +212,41 @@ export const WordListPage = () => {
     scrollListTop();
   };
 
+  const handleListTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartXRef.current = e.changedTouches[0]?.clientX ?? null;
+    touchStartYRef.current = e.changedTouches[0]?.clientY ?? null;
+  };
+
+  const handleListTouchEnd = async (e: React.TouchEvent<HTMLDivElement>) => {
+    if (touchStartXRef.current === null || touchStartYRef.current === null) return;
+
+    const endX = e.changedTouches[0]?.clientX ?? touchStartXRef.current;
+    const endY = e.changedTouches[0]?.clientY ?? touchStartYRef.current;
+    const diffX = endX - touchStartXRef.current;
+    const diffY = endY - touchStartYRef.current;
+
+    touchStartXRef.current = null;
+    touchStartYRef.current = null;
+
+    if (Math.abs(diffY) > Math.abs(diffX)) return;
+    if (Math.abs(diffX) < 50) return;
+
+    // 왼쪽 스와이프: 다음 페이지, 오른쪽 스와이프: 이전 페이지
+    if (diffX < 0) {
+      if (listMode === 'all') {
+        await loadNextPage();
+      } else {
+        nextClientPage();
+      }
+    } else {
+      if (listMode === 'all') {
+        await loadPrevPage();
+      } else {
+        prevClientPage();
+      }
+    }
+  };
+
   return (
     <div className="word-list-container">
       <div className="range-controls">
@@ -284,7 +321,11 @@ export const WordListPage = () => {
         <div className="word-stats">현재 표시 단어: {displayWords.length}개{searchTerm ? ` (검색결과 ${filteredWords.length}개)` : ''}</div>
       )}
 
-      <div className={`word-list ${compactView ? 'compact' : ''}`}>
+      <div
+        className={`word-list ${compactView ? 'compact' : ''}`}
+        onTouchStart={handleListTouchStart}
+        onTouchEnd={handleListTouchEnd}
+      >
         {displayWords.length > 0 ? (
           displayWords.map((word, index) => (
             <div key={`${word.seq}-${word.word}-${index}`} className="word-item">
@@ -299,6 +340,8 @@ export const WordListPage = () => {
           !loading && <div className="no-words">표시할 단어가 없습니다.</div>
         )}
       </div>
+
+      {!loading && <div className="swipe-page-hint">← 오른쪽 스와이프: 이전 · 왼쪽 스와이프: 다음 →</div>}
 
       {listMode === 'all' && !customRangeMode && !loading && (
         <div className="pagination-controls bottom-pagination-controls">
