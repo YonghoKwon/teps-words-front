@@ -733,8 +733,8 @@ button:hover, .next-word-button:hover {
 }
 
 .swipe-guide {
-    margin-top: 10px;
-    margin-bottom: 12px;
+    margin-top: 8px;
+    margin-bottom: 8px;
     opacity: 0.85;
 }
 
@@ -965,7 +965,7 @@ button:hover, .next-word-button:hover {
     left: 0;
     right: 0;
     bottom: 0;
-    margin-top: 12px;
+    margin-top: 6px;
 }
 
 .mobile-fixed-cta,

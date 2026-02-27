@@ -142,13 +142,13 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
     }
   };
 
-  const handleMarkWrong = async () => {
+  const handleMarkWrong = async (silent = false) => {
     if (!currentWord || currentWord.seq === 0) return;
 
     const key = `${wordType}:${currentWord.seq}:${currentWord.word}:${currentWord.partOfSpeech}:${currentWord.meaning}`;
     const now = Date.now();
     if (lastWrongKeyRef.current === key && now - lastWrongTimeRef.current < 1500) {
-      showGestureHint('잠시 후 다시 시도');
+      if (!silent) showGestureHint('잠시 후 다시 시도');
       return;
     }
 
@@ -158,7 +158,7 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
       lastWrongKeyRef.current = key;
       lastWrongTimeRef.current = now;
       setProgressError(null);
-      showGestureHint('오답 저장');
+      if (!silent) showGestureHint('오답 저장');
     } catch (error) {
       setProgressError(error instanceof Error ? error.message : '오답 저장 중 오류가 발생했습니다.');
     }
@@ -241,10 +241,12 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
     }
 
     if (!isCorrect) {
-      await handleMarkWrong();
+      await handleMarkWrong(true);
     }
 
-    showGestureHint(isCorrect ? '정답!' : '오답!');
+    window.setTimeout(() => {
+      handleNextWord();
+    }, 3000);
   };
 
   return (
@@ -281,7 +283,7 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
         <button className={`bookmark-button ${bookmarked ? 'active' : ''}`} onClick={handleToggleBookmark}>
           {bookmarked ? '★ 즐겨찾기됨' : '☆ 즐겨찾기'}
         </button>
-        <button className="wrong-button" onClick={handleMarkWrong}>오답 +1</button>
+        <button className="wrong-button" onClick={() => handleMarkWrong(false)}>오답 +1</button>
       </div>
 
       <div className="progress-status">
