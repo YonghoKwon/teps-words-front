@@ -989,6 +989,10 @@ button:hover, .next-word-button:hover {
     background: #475569;
 }
 
+.mobile-fixed-quiz-btn.active {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+}
+
 :root[data-mantine-color-scheme='dark'] .word-card {
     background: linear-gradient(165deg, #111827 0%, #0f172a 100%);
     color: #e5e7eb;

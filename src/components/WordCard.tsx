@@ -19,12 +19,15 @@ const defaultWord: Word = {
 
 let sessionQuizTotalCache = 0;
 let sessionQuizCorrectCache = 0;
+let quizModeEnabledCache = false;
 
 try {
   const t = Number(sessionStorage.getItem('quiz_total') || '0');
   const c = Number(sessionStorage.getItem('quiz_correct') || '0');
+  const m = sessionStorage.getItem('quiz_mode_enabled');
   if (Number.isFinite(t)) sessionQuizTotalCache = t;
   if (Number.isFinite(c)) sessionQuizCorrectCache = c;
+  quizModeEnabledCache = m === '1';
 } catch (_) {
   // ignore
 }
@@ -44,6 +47,7 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
   const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
   const [quizLoading, setQuizLoading] = useState(false);
   const [quizTarget, setQuizTarget] = useState<'meaning' | 'word'>('meaning');
+  const [quizModeEnabled, setQuizModeEnabled] = useState(quizModeEnabledCache);
   const [autoNextCountdown, setAutoNextCountdown] = useState<number | null>(null);
 
   const [sessionQuizTotal, setSessionQuizTotal] = useState(0);
@@ -84,6 +88,27 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [promptMode]);
+
+  useEffect(() => {
+    quizModeEnabledCache = quizModeEnabled;
+    try {
+      sessionStorage.setItem('quiz_mode_enabled', quizModeEnabled ? '1' : '0');
+    } catch (_) {
+      // ignore
+    }
+  }, [quizModeEnabled]);
+
+  useEffect(() => {
+    if (quizModeEnabled) {
+      buildChoiceQuiz();
+    } else {
+      setShowChoiceQuiz(false);
+      setQuizChoices([]);
+      setQuizSelected(null);
+      setQuizResult(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentWord.word, currentWord.meaning, currentWord.partOfSpeech, currentWord.seq, quizModeEnabled]);
 
   const loadProgress = async () => {
     if (!currentWord || currentWord.seq === 0) return;
@@ -410,14 +435,14 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
             {showAnswer ? '다음 단어' : '정답 보기'}
           </button>
           <button
-            className="mobile-fixed-quiz-btn"
-            onClick={async (e) => {
+            className={`mobile-fixed-quiz-btn ${quizModeEnabled ? 'active' : ''}`}
+            onClick={(e) => {
               e.stopPropagation();
-              await buildChoiceQuiz();
+              setQuizModeEnabled((v) => !v);
             }}
             disabled={quizLoading}
           >
-            {quizLoading ? '생성 중...' : (promptMode === 'english' ? '영단어 퀴즈' : '뜻 퀴즈')}
+            {quizLoading ? '생성 중...' : `퀴즈 모드 ${quizModeEnabled ? 'ON' : 'OFF'}`}
           </button>
         </div>
       </div>
