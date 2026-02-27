@@ -5,6 +5,7 @@ import '../styles/WordList.css';
 type ListMode = 'all' | 'bookmark' | 'wrong';
 
 const RANGE_SIZE = 20;
+const CLIENT_PAGE_SIZE = 20;
 
 export const WordListPage = () => {
   const [words, setWords] = useState<Word[]>([]);
@@ -20,6 +21,9 @@ export const WordListPage = () => {
   const [customRangeMode, setCustomRangeMode] = useState(false);
   const [customStartSeq, setCustomStartSeq] = useState('');
   const [customEndSeq, setCustomEndSeq] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [compactView, setCompactView] = useState(true);
+  const [clientPage, setClientPage] = useState(1);
 
   const fetchWords = async (start: number, end: number) => {
     setLoading(true);
@@ -127,12 +131,17 @@ export const WordListPage = () => {
     await loadRangeWords(1, RANGE_SIZE);
   };
 
+  const scrollListTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const loadNextPage = async () => {
     if (loading || !hasNext || listMode !== 'all') return;
     const { endSeq } = currentRange;
     const nextStartSeq = endSeq + 1;
     const nextEndSeq = nextStartSeq + RANGE_SIZE - 1;
     await loadRangeWords(nextStartSeq, nextEndSeq);
+    scrollListTop();
   };
 
   const loadPrevPage = async () => {
@@ -140,6 +149,7 @@ export const WordListPage = () => {
     const prevStartSeq = Math.max(1, currentRange.startSeq - RANGE_SIZE);
     const prevEndSeq = prevStartSeq + RANGE_SIZE - 1;
     await loadRangeWords(prevStartSeq, prevEndSeq);
+    scrollListTop();
   };
 
   const handleCustomRangeSearch = async () => {
@@ -166,6 +176,7 @@ export const WordListPage = () => {
 
   useEffect(() => {
     setError(null);
+    setClientPage(1);
     if (listMode !== 'all') {
       setCustomRangeMode(false);
     }
@@ -177,6 +188,27 @@ export const WordListPage = () => {
       loadInitialData();
     }
   }, [customRangeMode]);
+
+  const filteredWords = words.filter((w) => {
+    if (!searchTerm.trim()) return true;
+    const q = searchTerm.trim().toLowerCase();
+    return w.word.toLowerCase().includes(q) || w.meaning.toLowerCase().includes(q);
+  });
+
+  const totalClientPages = Math.max(1, Math.ceil(filteredWords.length / CLIENT_PAGE_SIZE));
+  const displayWords = listMode === 'all'
+    ? filteredWords
+    : filteredWords.slice((clientPage - 1) * CLIENT_PAGE_SIZE, clientPage * CLIENT_PAGE_SIZE);
+
+  const nextClientPage = () => {
+    setClientPage((p) => Math.min(totalClientPages, p + 1));
+    scrollListTop();
+  };
+
+  const prevClientPage = () => {
+    setClientPage((p) => Math.max(1, p - 1));
+    scrollListTop();
+  };
 
   return (
     <div className="word-list-container">
@@ -217,6 +249,31 @@ export const WordListPage = () => {
             )}
           </>
         )}
+
+        {listMode !== 'all' && !loading && (
+          <div className="pagination-controls">
+            <div className="pagination-buttons-row">
+              <button className="page-button" onClick={prevClientPage} disabled={clientPage <= 1}>이전</button>
+              <button className="page-button" onClick={nextClientPage} disabled={clientPage >= totalClientPages}>다음</button>
+            </div>
+            <span className="current-range">현재 페이지: {clientPage}/{totalClientPages}</span>
+          </div>
+        )}
+      </div>
+
+      <div className="list-enhance-row">
+        <input
+          className="list-search-input"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setClientPage(1);
+          }}
+          placeholder="단어/뜻 검색"
+        />
+        <button className="range-button" onClick={() => setCompactView(v => !v)}>
+          {compactView ? '기본 보기' : '컴팩트'}
+        </button>
       </div>
 
       {error && <div className="error-message">{error}</div>}
@@ -224,12 +281,12 @@ export const WordListPage = () => {
       {loading ? (
         <div className="loading">단어를 불러오는 중...</div>
       ) : (
-        <div className="word-stats">현재 표시 단어: {words.length}개</div>
+        <div className="word-stats">현재 표시 단어: {displayWords.length}개{searchTerm ? ` (검색결과 ${filteredWords.length}개)` : ''}</div>
       )}
 
-      <div className="word-list">
-        {words.length > 0 ? (
-          words.map((word, index) => (
+      <div className={`word-list ${compactView ? 'compact' : ''}`}>
+        {displayWords.length > 0 ? (
+          displayWords.map((word, index) => (
             <div key={`${word.seq}-${word.word}-${index}`} className="word-item">
               <div className="word-number">{word.seq}</div>
               <div className="word-list-content">
@@ -250,6 +307,16 @@ export const WordListPage = () => {
             <button className="page-button" onClick={loadNextPage} disabled={loading || !hasNext}>다음</button>
           </div>
           <span className="current-range">현재 범위: {currentRange.startSeq}~{currentRange.endSeq}</span>
+        </div>
+      )}
+
+      {listMode !== 'all' && !loading && (
+        <div className="pagination-controls bottom-pagination-controls">
+          <div className="pagination-buttons-row">
+            <button className="page-button" onClick={prevClientPage} disabled={clientPage <= 1}>이전</button>
+            <button className="page-button" onClick={nextClientPage} disabled={clientPage >= totalClientPages}>다음</button>
+          </div>
+          <span className="current-range">현재 페이지: {clientPage}/{totalClientPages}</span>
         </div>
       )}
     </div>
