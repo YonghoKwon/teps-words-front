@@ -127,7 +127,7 @@
     margin-top: 10px;
     position: relative;
     padding-bottom: 66px;
-    min-height: 280px;
+    min-height: 220px;
 }
 
 /* 단어 질문 스타일 - 영어 단어와 동일한 스타일로 변경 */
@@ -666,7 +666,7 @@ button:hover, .next-word-button:hover {
 .progress-actions {
     display: flex;
     gap: 8px;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .word-card {

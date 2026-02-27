@@ -329,12 +329,9 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
         <button className={`bookmark-button ${bookmarked ? 'active' : ''}`} onClick={handleToggleBookmark}>
           {bookmarked ? '★ 즐겨찾기됨' : '☆ 즐겨찾기'}
         </button>
-        <button className="wrong-button" onClick={() => handleMarkWrong(false)}>오답 +1</button>
       </div>
 
-      <div className="progress-status">
-        {progressLoading ? '진행 상태 불러오는 중...' : `오답 ${wrongCount}회`}
-      </div>
+      {progressLoading && <div className="progress-status">진행 상태 불러오는 중...</div>}
       <div className="quiz-accuracy-status">
         퀴즈 정답률(세션): {sessionQuizTotal > 0 ? `${Math.round((sessionQuizCorrect / sessionQuizTotal) * 100)}% (${sessionQuizCorrect}/${sessionQuizTotal})` : '아직 없음'}
       </div>

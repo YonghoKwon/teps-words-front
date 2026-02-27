@@ -230,7 +230,7 @@ export const WordListPage = () => {
           words.map((word, index) => (
             <div key={`${word.seq}-${word.word}-${index}`} className="word-item">
               <div className="word-number">{word.seq}</div>
-              <div className="word-content">
+              <div className="word-list-content">
                 <div className="word-english">{word.word} <span className="word-part">{word.partOfSpeech}</span></div>
                 <div className="word-meaning">{word.meaning}</div>
               </div>
