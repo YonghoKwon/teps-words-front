@@ -700,6 +700,7 @@ button:hover, .next-word-button:hover {
 @media (max-width: 480px) {
     .word-card {
         padding: 12px;
+        padding-bottom: 82px;
     }
 
     .setting-row {
@@ -718,5 +719,73 @@ button:hover, .next-word-button:hover {
 
     .model-selector select {
         max-width: 160px;
+    }
+
+    .action-area {
+        display: none;
+    }
+}
+
+.swipe-guide {
+    margin-top: 14px;
+    color: var(--text-light);
+    font-size: 12px;
+    text-align: center;
+}
+
+.gesture-toast {
+    position: absolute;
+    left: 50%;
+    bottom: 88px;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.82);
+    color: #fff;
+    font-size: 12px;
+    padding: 7px 12px;
+    border-radius: 999px;
+    z-index: 30;
+}
+
+.mobile-fixed-cta {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    .mobile-fixed-cta {
+        display: block;
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        bottom: calc(10px + env(safe-area-inset-bottom));
+        width: auto;
+        max-width: 960px;
+        margin: 0 auto;
+        min-height: 48px;
+        border-radius: 12px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        box-shadow: 0 10px 25px rgba(47, 128, 237, 0.35);
+        z-index: 40;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .word-card {
+        background: #111827;
+        color: #e5e7eb;
+    }
+
+    .swipe-guide {
+        color: #9ca3af;
+    }
+
+    .gesture-toast {
+        background: rgba(255, 255, 255, 0.15);
+        color: #f9fafb;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .mobile-fixed-cta {
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
     }
 }

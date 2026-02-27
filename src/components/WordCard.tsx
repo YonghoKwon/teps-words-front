@@ -35,7 +35,7 @@ let isModelsFetching = false;
 
 // 자동 변경 설정을 저장하기 위한 전역 변수
 let isAutoChangeEnabled = false;
-let autoChangeInterval = 3; // 초 단위 기본값
+let autoChangeInterval = 5; // 초 단위 기본값
 
 // 예문 보기 설정을 저장하기 위한 전역 변수 추가
 let isShowExamplesEnabled = false;
@@ -64,6 +64,9 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
   const currentWordRef = useRef('');
   // 컴포넌트가 마운트 됐는지 추적
   const isMountedRef = useRef(false);
+  // 스와이프 제스처용 ref/state
+  const touchStartXRef = useRef<number | null>(null);
+  const [gestureHint, setGestureHint] = useState<string | null>(null);
 
   // 서버에서 단어를 불러오지 못했을 때 기본 단어 사용
   const currentWord = word || defaultWord;
@@ -280,8 +283,43 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
     }
   };
 
+  const showGestureHint = (message: string) => {
+    setGestureHint(message);
+    window.setTimeout(() => setGestureHint(null), 1200);
+  };
+
+  const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    touchStartXRef.current = e.changedTouches[0]?.clientX ?? null;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (autoChangeEnabled || touchStartXRef.current === null) return;
+
+    const endX = e.changedTouches[0]?.clientX ?? touchStartXRef.current;
+    const diffX = endX - touchStartXRef.current;
+    touchStartXRef.current = null;
+
+    if (Math.abs(diffX) < 50) return;
+
+    if (diffX > 0) {
+      // 오른쪽 스와이프: 정답 보기
+      if (!showAnswer) {
+        setShowAnswer(true);
+        showGestureHint('정답 표시');
+      }
+    } else {
+      // 왼쪽 스와이프: 다음 단어
+      handleNextWord();
+      showGestureHint('다음 단어');
+    }
+  };
+
   return (
-    <div className={`word-card ${!showAnswer && !autoChangeEnabled ? 'clickable' : ''}`}>
+    <div
+      className={`word-card ${!showAnswer && !autoChangeEnabled ? 'clickable' : ''}`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* 설정 영역 (맨 위) */}
       <div className="settings-area">
         <div className="setting-options">
@@ -415,7 +453,31 @@ export const WordCard = ({ word, onNextWord }: WordCardProps) => {
             )}
           </>
         )}
+
+        {!autoChangeEnabled && (
+          <div className="swipe-guide">
+            ← 왼쪽 스와이프: 다음 단어 · 오른쪽 스와이프: 정답 보기 →
+          </div>
+        )}
       </div>
+
+      {gestureHint && <div className="gesture-toast">{gestureHint}</div>}
+
+      {!autoChangeEnabled && (
+        <button
+          className="mobile-fixed-cta"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (!showAnswer) {
+              setShowAnswer(true);
+            } else {
+              handleNextWord();
+            }
+          }}
+        >
+          {showAnswer ? '다음 단어' : '정답 보기'}
+        </button>
+      )}
     </div>
   );
 };
