@@ -704,14 +704,6 @@ button:hover, .next-word-button:hover {
     margin-bottom: 6px;
 }
 
-.fixed-text {
-    min-height: 34px;
-    display: flex;
-    align-items: center;
-    color: var(--text-medium);
-    font-size: 13px;
-    padding-right: 6px;
-}
 
 .progress-error {
     color: #dc2626;
@@ -823,7 +815,7 @@ button:hover, .next-word-button:hover {
 
 @media (max-width: 480px) {
     .meaning-quiz-box {
-        padding-bottom: 122px;
+        padding-bottom: 168px;
     }
 }
 

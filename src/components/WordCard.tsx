@@ -42,6 +42,8 @@ let autoChangeInterval = 5; // 초 단위 기본값
 // 예문 보기 설정을 저장하기 위한 전역 변수 추가
 let isShowExamplesEnabled = false;
 let lastSelectedModel = 'gpt-3.5-turbo';
+let sessionQuizTotalCache = 0;
+let sessionQuizCorrectCache = 0;
 
 export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
   const [showAnswer, setShowAnswer] = useState(false);
@@ -155,10 +157,14 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
   }, [autoChangeEnabled]);
 
   useEffect(() => {
-    const total = Number(sessionStorage.getItem('quiz_total') || '0');
-    const correct = Number(sessionStorage.getItem('quiz_correct') || '0');
-    setSessionQuizTotal(total);
-    setSessionQuizCorrect(correct);
+    const totalFromStorage = Number(sessionStorage.getItem('quiz_total') || '0');
+    const correctFromStorage = Number(sessionStorage.getItem('quiz_correct') || '0');
+
+    sessionQuizTotalCache = Number.isFinite(totalFromStorage) ? totalFromStorage : sessionQuizTotalCache;
+    sessionQuizCorrectCache = Number.isFinite(correctFromStorage) ? correctFromStorage : sessionQuizCorrectCache;
+
+    setSessionQuizTotal(sessionQuizTotalCache);
+    setSessionQuizCorrect(sessionQuizCorrectCache);
   }, []);
 
   // 자동 단어 변경 타이머 설정
@@ -462,8 +468,14 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
     const nextCorrect = sessionQuizCorrect + (isCorrect ? 1 : 0);
     setSessionQuizTotal(nextTotal);
     setSessionQuizCorrect(nextCorrect);
-    sessionStorage.setItem('quiz_total', String(nextTotal));
-    sessionStorage.setItem('quiz_correct', String(nextCorrect));
+    sessionQuizTotalCache = nextTotal;
+    sessionQuizCorrectCache = nextCorrect;
+    try {
+      sessionStorage.setItem('quiz_total', String(nextTotal));
+      sessionStorage.setItem('quiz_correct', String(nextCorrect));
+    } catch (_) {
+      // Safari private mode 등에서 sessionStorage 실패할 수 있어 메모리 캐시로 유지
+    }
 
     if (!isCorrect) {
       await handleMarkWrong();
@@ -537,12 +549,7 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
             </div>
           </div>
 
-          <div className="setting-row">
-            <label className="setting-option">
-              <span>스와이프 감도</span>
-            </label>
-            <div className="model-selector fixed-text">보통</div>
-          </div>
+
         </div>
       </div>
 
