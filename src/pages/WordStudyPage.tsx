@@ -31,6 +31,7 @@ export const WordStudyPage = () => {
   // 단어 유형 및 품사 필터 상태 추가
   const [wordType, setWordType] = useState<'concepts' | 'regular'>('concepts');
   const [partOfSpeech, setPartOfSpeech] = useState<string>('all');
+  const [reviewMode, setReviewMode] = useState(false);
 
   // API 호출 함수
   const fetchRandomWord = async () => {
@@ -39,6 +40,32 @@ export const WordStudyPage = () => {
 
     try {
       console.log('단어 가져오기 요청 시작');
+
+      if (reviewMode) {
+        const wrongResponse = await fetch('/api/words/wrongs');
+        if (!wrongResponse.ok) {
+          throw new Error('오답 목록을 가져오는데 실패했습니다.');
+        }
+
+        const wrongs = await wrongResponse.json();
+        if (!Array.isArray(wrongs) || wrongs.length === 0) {
+          throw new Error('저장된 오답이 없습니다. 오답 +1 버튼을 눌러 복습 단어를 쌓아보세요.');
+        }
+
+        const candidates = [...wrongs]
+          .sort((a, b) => (b.wrongCount ?? 0) - (a.wrongCount ?? 0))
+          .slice(0, 20)
+          .map(item => ({
+            seq: item.seq,
+            word: item.word,
+            partOfSpeech: item.partOfSpeech,
+            meaning: item.meaning,
+          }));
+
+        const pick = candidates[Math.floor(Math.random() * candidates.length)];
+        setCurrentWord(pick);
+        return;
+      }
 
       let endpoint = '/api/words/random';
 
@@ -129,6 +156,15 @@ export const WordStudyPage = () => {
               ))}
             </select>
           </div>
+
+          <label className="setting-option" style={{ marginLeft: 0 }}>
+            <input
+              type="checkbox"
+              checked={reviewMode}
+              onChange={(e) => setReviewMode(e.target.checked)}
+            />
+            <span>복습 모드(오답 우선)</span>
+          </label>
 
           <button
             className="apply-filter-button"

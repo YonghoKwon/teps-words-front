@@ -274,12 +274,13 @@ select {
     }
 
     .filter-controls {
-        padding: 10px;
-        margin-bottom: 10px;
+        padding: 8px;
+        margin-bottom: 8px;
+        border-radius: 12px;
     }
 
     .filter-section {
-        gap: 10px;
+        gap: 8px;
     }
 
     .word-type-selector,
@@ -305,14 +306,14 @@ select {
     .part-of-speech-selector select {
         width: 100%;
         min-width: 0;
-        min-height: 40px;
+        min-height: 38px;
         font-size: 14px;
     }
 
     .apply-filter-button {
         width: 100%;
         margin-top: 0;
-        min-height: 42px;
-        font-size: 15px;
+        min-height: 40px;
+        font-size: 14px;
     }
 }

@@ -60,6 +60,11 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
   const [progressLoading, setProgressLoading] = useState(false);
   const [progressError, setProgressError] = useState<string | null>(null);
   const [swipeLevel, setSwipeLevel] = useState<'low' | 'medium' | 'high'>(swipeSensitivity);
+  const [showChoiceQuiz, setShowChoiceQuiz] = useState(false);
+  const [quizChoices, setQuizChoices] = useState<string[]>([]);
+  const [quizSelected, setQuizSelected] = useState<string | null>(null);
+  const [quizResult, setQuizResult] = useState<'correct' | 'wrong' | null>(null);
+  const [quizLoading, setQuizLoading] = useState(false);
 
   // 자동 변경 관련 상태 추가 - 전역 변수에서 초기화
   const [autoChangeEnabled, setAutoChangeEnabled] = useState(isAutoChangeEnabled);
@@ -75,6 +80,8 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
   // 스와이프 제스처용 ref/state
   const touchStartXRef = useRef<number | null>(null);
   const touchStartYRef = useRef<number | null>(null);
+  const lastWrongKeyRef = useRef<string>('');
+  const lastWrongTimeRef = useRef<number>(0);
   const [gestureHint, setGestureHint] = useState<string | null>(null);
 
   // 서버에서 단어를 불러오지 못했을 때 기본 단어 사용
@@ -256,8 +263,12 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
     }
     // 자동 변경 모드에서는 항상 답변이 보이는 상태 유지
 
-    // 예문 초기화
+    // 예문/퀴즈 초기화
     setExampleSentence(null);
+    setShowChoiceQuiz(false);
+    setQuizChoices([]);
+    setQuizSelected(null);
+    setQuizResult(null);
     currentWordRef.current = '';
 
     onNextWord();
@@ -376,14 +387,71 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
 
   const handleMarkWrong = async () => {
     if (!currentWord || currentWord.seq === 0) return;
+
+    const key = `${wordType}:${currentWord.seq}:${currentWord.word}:${currentWord.partOfSpeech}:${currentWord.meaning}`;
+    const now = Date.now();
+    if (lastWrongKeyRef.current === key && now - lastWrongTimeRef.current < 1500) {
+      showGestureHint('잠시 후 다시 시도');
+      return;
+    }
+
     try {
       const wrong = await addWrongAnswer(currentWord, wordType);
       setWrongCount(wrong.wrongCount ?? wrongCount + 1);
+      lastWrongKeyRef.current = key;
+      lastWrongTimeRef.current = now;
       setProgressError(null);
       showGestureHint('오답 저장');
     } catch (error) {
       setProgressError(error instanceof Error ? error.message : '오답 저장 중 오류가 발생했습니다.');
     }
+  };
+
+  const shuffle = <T,>(arr: T[]): T[] => [...arr].sort(() => Math.random() - 0.5);
+
+  const buildMeaningQuiz = async () => {
+    if (!currentWord || currentWord.seq === 0) return;
+
+    setQuizLoading(true);
+    setQuizResult(null);
+    setQuizSelected(null);
+
+    try {
+      const startSeq = Math.max(1, currentWord.seq - 250);
+      const endSeq = currentWord.seq + 250;
+      const response = await fetch(`/api/words/range?startSeq=${startSeq}&endSeq=${endSeq}`);
+      if (!response.ok) {
+        throw new Error('퀴즈 선택지를 불러오지 못했습니다.');
+      }
+
+      const words: Word[] = await response.json();
+      const distractors = words
+        .filter((w) => w.meaning !== currentWord.meaning)
+        .filter((w) => w.partOfSpeech === currentWord.partOfSpeech)
+        .map((w) => w.meaning)
+        .filter((v, i, self) => self.indexOf(v) === i)
+        .slice(0, 30);
+
+      const picked = shuffle(distractors).slice(0, 2);
+      if (picked.length < 2) {
+        throw new Error('유사 보기 생성에 실패했어요. 다시 눌러주세요.');
+      }
+
+      setQuizChoices(shuffle([currentWord.meaning, ...picked]));
+      setShowChoiceQuiz(true);
+    } catch (error) {
+      setProgressError(error instanceof Error ? error.message : '유사 보기 퀴즈 생성 중 오류가 발생했습니다.');
+      setShowChoiceQuiz(false);
+    } finally {
+      setQuizLoading(false);
+    }
+  };
+
+  const handlePickChoice = (choice: string) => {
+    setQuizSelected(choice);
+    const isCorrect = choice === currentWord.meaning;
+    setQuizResult(isCorrect ? 'correct' : 'wrong');
+    showGestureHint(isCorrect ? '정답!' : '오답!');
   };
 
   return (
@@ -523,6 +591,29 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
               <div className="korean-meaning">{currentWord.meaning}</div>
             </div>
 
+            {showChoiceQuiz && (
+              <div className="meaning-quiz-box">
+                <div className="meaning-quiz-title">유사 답변 퀴즈 (1개 정답)</div>
+                <div className="meaning-quiz-options">
+                  {quizChoices.map((choice, idx) => (
+                    <button
+                      key={`${choice}-${idx}`}
+                      className={`meaning-choice ${quizSelected === choice ? 'selected' : ''}`}
+                      onClick={() => handlePickChoice(choice)}
+                      disabled={quizSelected !== null}
+                    >
+                      {idx + 1}. {choice}
+                    </button>
+                  ))}
+                </div>
+                {quizResult && (
+                  <div className={`meaning-quiz-result ${quizResult}`}>
+                    {quizResult === 'correct' ? '정답입니다! 🎉' : `오답입니다. 정답: ${currentWord.meaning}`}
+                  </div>
+                )}
+              </div>
+            )}
+
             {showExamples && (
               <div className="example-container">
                 <div className="example-header">
@@ -564,19 +655,33 @@ export const WordCard = ({ word, wordType, onNextWord }: WordCardProps) => {
       {gestureHint && <div className="gesture-toast">{gestureHint}</div>}
 
       {!autoChangeEnabled && (
-        <button
-          className="mobile-fixed-cta"
-          onClick={(e) => {
-            e.stopPropagation();
-            if (!showAnswer) {
-              setShowAnswer(true);
-            } else {
-              handleNextWord();
-            }
-          }}
-        >
-          {showAnswer ? '다음 단어' : '정답 보기'}
-        </button>
+        <div className="mobile-fixed-cta-wrap">
+          {showAnswer && (
+            <button
+              className="mobile-fixed-quiz-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                buildMeaningQuiz();
+              }}
+              disabled={quizLoading}
+            >
+              {quizLoading ? '생성 중...' : '유사 답변 퀴즈'}
+            </button>
+          )}
+          <button
+            className="mobile-fixed-cta"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!showAnswer) {
+                setShowAnswer(true);
+              } else {
+                handleNextWord();
+              }
+            }}
+          >
+            {showAnswer ? '다음 단어' : '정답 보기'}
+          </button>
+        </div>
       )}
     </div>
   );

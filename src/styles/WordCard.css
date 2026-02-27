@@ -743,14 +743,15 @@ button:hover, .next-word-button:hover {
 
 @media (max-width: 480px) {
     .word-card {
-        padding: 10px;
-        /* 하단 고정 CTA와 내용 겹침 방지 */
-        padding-bottom: 138px;
+        padding: 8px;
+        /* 하단 고정 CTA(2개 버튼)와 내용 겹침 방지 */
+        padding-bottom: 188px;
+        border-radius: 12px;
     }
 
     .settings-area {
-        margin-bottom: 8px;
-        padding: 8px;
+        margin-bottom: 6px;
+        padding: 6px;
     }
 
     .setting-row {
@@ -779,13 +780,71 @@ button:hover, .next-word-button:hover {
     }
 
     .progress-actions button {
-        min-height: 36px;
-        font-size: 13px;
+        min-height: 34px;
+        font-size: 12px;
+    }
+
+    .word-question,
+    .english-word {
+        font-size: clamp(1.55rem, 6vw, 1.95rem);
+    }
+
+    .korean-meaning {
+        font-size: clamp(1rem, 4vw, 1.25rem);
     }
 
     .action-area {
         display: none;
     }
+}
+
+.meaning-quiz-box {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #dbe4f0;
+    border-radius: 10px;
+    background: #f8fbff;
+}
+
+.meaning-quiz-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-medium);
+    margin-bottom: 8px;
+}
+
+.meaning-quiz-options {
+    display: grid;
+    gap: 6px;
+}
+
+.meaning-choice {
+    margin: 0;
+    min-height: 38px;
+    text-align: left;
+    font-size: 13px;
+    background: #fff;
+    color: #1f2937;
+    border: 1px solid #cfd9e6;
+}
+
+.meaning-choice.selected {
+    border-color: #2f80ed;
+    background: #e9f2ff;
+}
+
+.meaning-quiz-result {
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.meaning-quiz-result.correct {
+    color: #047857;
+}
+
+.meaning-quiz-result.wrong {
+    color: #b91c1c;
 }
 
 .swipe-guide {
@@ -808,27 +867,39 @@ button:hover, .next-word-button:hover {
     z-index: 30;
 }
 
-.mobile-fixed-cta {
+.mobile-fixed-cta-wrap {
     display: none;
 }
 
+.mobile-fixed-cta,
+.mobile-fixed-quiz-btn {
+    min-height: 46px;
+    border-radius: 12px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    margin: 0;
+}
+
+.mobile-fixed-quiz-btn {
+    background: #475569;
+}
+
 @media (max-width: 480px) {
-    .mobile-fixed-cta {
-        display: block;
+    .mobile-fixed-cta-wrap {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
         position: fixed;
         left: 12px;
         right: 12px;
-        /* iOS Safari 하단 툴바 위로 올려 겹침 방지 */
         bottom: calc(78px + env(safe-area-inset-bottom));
-        width: auto;
-        max-width: 960px;
-        margin: 0 auto;
-        min-height: 48px;
-        border-radius: 12px;
-        font-weight: 800;
-        letter-spacing: 0.2px;
-        box-shadow: 0 10px 25px rgba(47, 128, 237, 0.35);
         z-index: 40;
+    }
+
+    .mobile-fixed-cta,
+    .mobile-fixed-quiz-btn {
+        width: 100%;
+        box-shadow: 0 10px 25px rgba(47, 128, 237, 0.28);
     }
 }
 
@@ -854,6 +925,30 @@ button:hover, .next-word-button:hover {
         background: #3f1d1d;
         color: #fecaca;
         border-color: #7f1d1d;
+    }
+
+    .meaning-quiz-box {
+        background: #0f1d33;
+        border-color: #2a3b57;
+    }
+
+    .meaning-quiz-title {
+        color: #d1d5db;
+    }
+
+    .meaning-choice {
+        background: #152238;
+        color: #e5e7eb;
+        border-color: #334155;
+    }
+
+    .meaning-choice.selected {
+        background: #1e3a5f;
+        border-color: #60a5fa;
+    }
+
+    .mobile-fixed-quiz-btn {
+        background: #334155;
     }
 
     .swipe-guide {

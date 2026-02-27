@@ -75,6 +75,10 @@
     margin-bottom: var(--spacing-md);
 }
 
+.mode-toggle .range-button {
+    font-weight: 700;
+}
+
 .range-button {
     flex: 1;
     padding: var(--spacing-sm);
