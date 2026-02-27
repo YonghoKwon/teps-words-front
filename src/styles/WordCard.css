@@ -744,7 +744,8 @@ button:hover, .next-word-button:hover {
 @media (max-width: 480px) {
     .word-card {
         padding: 12px;
-        padding-bottom: 82px;
+        /* 하단 고정 CTA와 내용 겹침 방지 */
+        padding-bottom: 140px;
     }
 
     .setting-row {
@@ -800,7 +801,8 @@ button:hover, .next-word-button:hover {
         position: fixed;
         left: 12px;
         right: 12px;
-        bottom: calc(10px + env(safe-area-inset-bottom));
+        /* iOS Safari 하단 툴바 위로 올려 겹침 방지 */
+        bottom: calc(78px + env(safe-area-inset-bottom));
         width: auto;
         max-width: 960px;
         margin: 0 auto;
