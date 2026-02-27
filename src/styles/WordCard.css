@@ -743,18 +743,28 @@ button:hover, .next-word-button:hover {
 
 @media (max-width: 480px) {
     .word-card {
-        padding: 12px;
+        padding: 10px;
         /* 하단 고정 CTA와 내용 겹침 방지 */
-        padding-bottom: 140px;
+        padding-bottom: 138px;
+    }
+
+    .settings-area {
+        margin-bottom: 8px;
+        padding: 8px;
     }
 
     .setting-row {
         align-items: center;
+        gap: 6px;
+    }
+
+    .setting-option {
+        font-size: 13px;
     }
 
     .interval-selector input {
         width: 52px !important;
-        min-height: 34px;
+        min-height: 32px;
     }
 
     .model-selector {
@@ -763,7 +773,14 @@ button:hover, .next-word-button:hover {
     }
 
     .model-selector select {
-        max-width: 160px;
+        max-width: 150px;
+        min-height: 34px;
+        font-size: 13px;
+    }
+
+    .progress-actions button {
+        min-height: 36px;
+        font-size: 13px;
     }
 
     .action-area {
