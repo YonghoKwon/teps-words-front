@@ -389,16 +389,20 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
                 </button>
               ))}
             </div>
-            {quizResult && (
-              <div className="meaning-quiz-feedback">
-                <div className={`meaning-quiz-result ${quizResult}`}>
-                  {quizResult === 'correct' ? '정답입니다!' : `오답입니다. 정답: ${quizTarget === 'meaning' ? currentWord.meaning : currentWord.word}`}
-                </div>
-                {autoNextCountdown !== null && (
-                  <button className="auto-next-countdown" onClick={handleNextWord}>{autoNextCountdown}초 후 다음 · 바로 넘기기</button>
-                )}
+            <div className={`meaning-quiz-feedback ${quizResult ? 'visible' : ''}`}>
+              <div className={`meaning-quiz-result ${quizResult ?? ''}`}>
+                {quizResult === 'correct' && '정답입니다!'}
+                {quizResult === 'wrong' && `오답입니다. 정답: ${quizTarget === 'meaning' ? currentWord.meaning : currentWord.word}`}
               </div>
-            )}
+              <button
+                className="auto-next-countdown"
+                onClick={handleNextWord}
+                disabled={autoNextCountdown === null}
+                aria-hidden={autoNextCountdown === null}
+              >
+                {autoNextCountdown ?? 3}초 후 다음 · 바로 넘기기
+              </button>
+            </div>
           </div>
         )}
 

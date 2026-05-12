@@ -252,15 +252,26 @@
 }
 
 .meaning-quiz-feedback {
+    min-height: 36px;
     display: grid;
+    grid-template-columns: minmax(0, 1fr) 150px;
+    align-items: center;
     gap: 8px;
     margin-top: 10px;
+    visibility: hidden;
+}
+
+.meaning-quiz-feedback.visible {
+    visibility: visible;
 }
 
 .meaning-quiz-result {
     font-size: 13px;
     font-weight: 950;
-    text-align: center;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .meaning-quiz-result.correct {
@@ -281,6 +292,10 @@
     color: #1d4ed8;
     font-size: 12px;
     font-weight: 900;
+}
+
+.auto-next-countdown:disabled {
+    cursor: default;
 }
 
 .swipe-guide {
@@ -501,6 +516,22 @@
         font-size: 11px;
     }
 
+    .meaning-quiz-feedback {
+        min-height: 30px;
+        grid-template-columns: minmax(0, 1fr) 116px;
+        gap: 6px;
+        margin-top: 6px;
+    }
+
+    .meaning-quiz-result {
+        font-size: 11px;
+    }
+
+    .auto-next-countdown {
+        min-height: 30px;
+        font-size: 10px;
+    }
+
     .swipe-guide {
         padding-top: 7px;
         font-size: 11px;
@@ -572,6 +603,15 @@
         min-height: 34px;
         padding-top: 5px;
         padding-bottom: 5px;
+    }
+
+    .meaning-quiz-feedback {
+        min-height: 28px;
+        margin-top: 5px;
+    }
+
+    .auto-next-countdown {
+        min-height: 28px;
     }
 
     .swipe-guide {
