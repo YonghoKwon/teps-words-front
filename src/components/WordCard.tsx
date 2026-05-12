@@ -71,6 +71,8 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
 
   useEffect(() => {
     loadProgress();
+    setShowAnswer(false);
+    clearQuizState();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentWord.word, currentWord.meaning, currentWord.partOfSpeech, currentWord.seq, wordType]);
 

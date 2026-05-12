@@ -57,7 +57,7 @@
     cursor: pointer;
     font-size: 13px;
     font-weight: 900;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
 }
 
 .bookmark-button {
@@ -157,10 +157,10 @@
     flex-wrap: wrap;
     gap: 0.5rem;
     color: var(--card-text);
-    font-size: clamp(2.1rem, 8.8vw, 3.4rem);
+    font-size: clamp(2rem, 8vw, 3.25rem);
     line-height: 1.1;
     font-weight: 950;
-    letter-spacing: -0.055em;
+    letter-spacing: 0;
     word-break: break-word;
 }
 
@@ -316,7 +316,7 @@
     cursor: pointer;
     font-size: 16px;
     font-weight: 950;
-    letter-spacing: -0.03em;
+    letter-spacing: 0;
 }
 
 .mobile-fixed-cta {
@@ -425,10 +425,10 @@
 
 @media screen and (max-width: 480px) {
     .word-card {
-        min-height: 430px;
+        min-height: 418px;
         margin-top: 12px;
         padding: 14px;
-        border-radius: 22px;
+        border-radius: 18px;
     }
 
     .card-top-row {
@@ -454,12 +454,12 @@
     }
 
     .word-content {
-        min-height: 292px;
+        min-height: 280px;
         padding-bottom: 66px;
     }
 
     .word-main-panel {
-        min-height: 142px;
+        min-height: 130px;
     }
 
     .meaning-quiz-box {

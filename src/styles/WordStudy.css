@@ -32,7 +32,7 @@
     color: #60a5fa;
     font-size: 12px;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0;
     text-transform: uppercase;
 }
 
@@ -41,7 +41,7 @@
     color: var(--text-dark);
     font-size: clamp(20px, 5vw, 32px);
     line-height: 1.18;
-    letter-spacing: -0.04em;
+    letter-spacing: 0;
 }
 
 .study-helper {
@@ -149,7 +149,7 @@ select {
     cursor: pointer;
     font-size: 15px;
     font-weight: 900;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     box-shadow: 0 14px 34px rgba(37, 99, 235, 0.28);
 }
 
@@ -265,6 +265,12 @@ select {
     .study-hero {
         align-items: flex-start;
         margin: 2px 2px 10px;
+        gap: 10px;
+    }
+
+    .study-hero h1 {
+        font-size: 21px;
+        line-height: 1.25;
     }
 
     .study-helper {
