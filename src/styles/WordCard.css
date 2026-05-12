@@ -425,58 +425,161 @@
 
 @media screen and (max-width: 480px) {
     .word-card {
-        min-height: 418px;
-        margin-top: 12px;
-        padding: 14px;
-        border-radius: 18px;
+        min-height: 392px;
+        margin-top: 8px;
+        padding: 10px;
+        border-radius: 16px;
+        box-shadow: 0 16px 38px rgba(15, 23, 42, 0.18);
     }
 
     .card-top-row {
-        gap: 7px;
-        margin-bottom: 8px;
+        gap: 6px;
+        margin-bottom: 6px;
     }
 
     .bookmark-button,
     .wrong-button {
-        min-height: 40px;
-        font-size: 12px;
-        border-radius: 13px;
+        min-height: 34px;
+        font-size: 11px;
+        border-radius: 11px;
     }
 
     .quiz-accuracy-status {
-        min-height: 38px;
-        margin-bottom: 6px;
-        font-size: 12px;
+        min-height: 32px;
+        margin-bottom: 4px;
+        gap: 6px;
+        font-size: 11px;
+        border-radius: 11px;
     }
 
     .quiz-accuracy-status strong {
-        font-size: 15px;
+        font-size: 13px;
     }
 
     .word-content {
-        min-height: 280px;
-        padding-bottom: 66px;
+        min-height: 266px;
+        padding-bottom: 54px;
     }
 
     .word-main-panel {
-        min-height: 130px;
+        min-height: 116px;
+    }
+
+    .word-question,
+    .english-word {
+        font-size: clamp(1.75rem, 7.2vw, 2.7rem);
+        line-height: 1.08;
     }
 
     .meaning-quiz-box {
-        padding: 10px;
-        border-radius: 16px;
+        margin-top: 0;
+        padding: 8px;
+        border-radius: 13px;
+    }
+
+    .meaning-quiz-title {
+        margin-bottom: 7px;
+        font-size: 11px;
+    }
+
+    .meaning-quiz-options {
+        gap: 6px;
     }
 
     .meaning-choice {
-        min-height: 42px;
-        font-size: 12px;
-        border-radius: 13px;
+        min-height: 36px;
+        grid-template-columns: 24px 1fr;
+        gap: 7px;
+        padding: 6px 10px;
+        font-size: 11px;
+        border-radius: 11px;
+    }
+
+    .meaning-choice span {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+    }
+
+    .swipe-guide {
+        padding-top: 7px;
+        font-size: 11px;
     }
 
     .mobile-fixed-cta,
     .mobile-fixed-quiz-btn {
-        min-height: 50px;
-        border-radius: 16px;
-        font-size: 15px;
+        min-height: 44px;
+        border-radius: 14px;
+        font-size: 14px;
+        box-shadow: none;
+    }
+
+    .mobile-fixed-cta-wrap {
+        gap: 8px;
+    }
+
+    .quiz-active {
+        min-height: 386px;
+    }
+
+    .quiz-active .word-content {
+        min-height: 260px;
+    }
+
+    .quiz-active .word-main-panel {
+        min-height: 76px;
+    }
+
+    .quiz-active .word-question,
+    .quiz-active .english-word {
+        font-size: clamp(1.55rem, 6.8vw, 2.35rem);
+    }
+}
+
+@media screen and (max-width: 480px) and (max-height: 740px) {
+    .word-card {
+        min-height: 366px;
+        margin-top: 6px;
+        padding: 9px;
+    }
+
+    .word-content {
+        min-height: 238px;
+        padding-bottom: 50px;
+    }
+
+    .word-main-panel {
+        min-height: 92px;
+    }
+
+    .quiz-active {
+        min-height: 354px;
+    }
+
+    .quiz-active .word-content {
+        min-height: 230px;
+    }
+
+    .quiz-active .word-main-panel {
+        min-height: 58px;
+    }
+
+    .meaning-quiz-box {
+        padding: 7px;
+    }
+
+    .meaning-choice {
+        min-height: 34px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    .swipe-guide {
+        padding-top: 5px;
+    }
+
+    .mobile-fixed-cta,
+    .mobile-fixed-quiz-btn {
+        min-height: 42px;
     }
 }

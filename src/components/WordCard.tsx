@@ -330,7 +330,7 @@ export const WordCard = ({ word, wordType, promptMode, onNextWord }: WordCardPro
 
   return (
     <div
-      className={`word-card ${!showAnswer ? 'clickable' : ''}`}
+      className={`word-card ${showChoiceQuiz ? 'quiz-active' : ''} ${!showAnswer ? 'clickable' : ''}`}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
